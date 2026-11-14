@@ -164,6 +164,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 {
 const $=s=>document.querySelector(s),V3=THREE.Vector3,PI=Math.PI;
@@ -820,14 +821,42 @@ function netOut(dt){net.acc+=dt;if(net.acc<.05||!net.gr)return;net.acc=0;const m
  net.gr.presence({v:1,nm:me.name,ci:me.ci|0,s:[r2(me.pos.x),r2(me.pos.y),r2(me.pos.z),r3(me.yaw),r3(me.pitch)],hp:Math.ceil(Math.max(0,me.hp)),sh:Math.ceil(me.sh),dd:me.dead?1:0,
   pu:me.pu,pn:me.pn,fl:(me.flurry||me.spinA)?1:0,cb:[me.cbN,me.cbK],ph:me.ph,pS:me.pS,bl:me.bl?1:0,sc:me.score,dc:net.dc,kb:net.kb,ev:net.ev,
   cs:net.host?chests.map(c=>[c.id,c.sp,c.rar,c.hp,c.max]):null,co:net.host?net.co:null,tl:net.host?Math.ceil(Math.max(0,matchT)):null}).catch(()=>{})}
-async function joinGame(code){code=String(code||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8);if(!code){$('#onst').textContent='Digite um código de sala.';return}
- if(!room){$('#onst').textContent='O modo online não está disponível aqui.';return}
+let p2p=false;
+const P2P={async join(code,host){
+ if(!window.Peer)throw{code:'sem_peerjs'};
+ const rid='uppercut-sala-'+code,pres={};let myId=null,peer=null,hostConn=null;const conns=new Map();
+ const api={myId:null,onHostLeft:null,
+  peers(){return Object.keys(pres).map(id=>({peer:id,sameTab:id===myId,by:null,isMe:id===myId,presence:pres[id]}))},
+  presence(o){if(!myId)return Promise.resolve();pres[myId]=o;
+   if(host){const msg={t:'all',p:pres};for(const c of conns.values())if(c.open)try{c.send(msg)}catch(e){}}
+   else if(hostConn&&hostConn.open)try{hostConn.send({t:'me',p:o})}catch(e){}
+   return Promise.resolve()},
+  leave(){try{peer&&peer.destroy()}catch(e){}return Promise.resolve()}};
+ await new Promise((res,rej)=>{
+  peer=host?new Peer(rid):new Peer();const to=setTimeout(()=>{try{peer.destroy()}catch(e){}rej({code:'tempo'})},15000);
+  peer.on('error',e=>{clearTimeout(to);try{peer.destroy()}catch(x){}rej({code:e&&e.type||'erro'})});
+  peer.on('open',id=>{myId=id;api.myId=id;
+   if(host){clearTimeout(to);
+    peer.on('connection',c=>{c.on('open',()=>conns.set(c.peer,c));
+     c.on('data',d=>{if(d&&d.t==='me'&&d.p&&typeof d.p==='object')pres[c.peer]=d.p});
+     c.on('close',()=>{conns.delete(c.peer);delete pres[c.peer]});c.on('error',()=>{conns.delete(c.peer);delete pres[c.peer]})});res()}
+   else{hostConn=peer.connect(rid,{serialization:'json'});
+    hostConn.on('open',()=>{clearTimeout(to);res()});
+    hostConn.on('data',d=>{if(d&&d.t==='all'&&d.p&&typeof d.p==='object'){for(const k in pres)if(k!==myId&&!(k in d.p))delete pres[k];for(const k in d.p)if(k!==myId)pres[k]=d.p[k]}});
+    hostConn.on('close',()=>{for(const k in pres)if(k!==myId)delete pres[k];if(api.onHostLeft)api.onHostLeft()})}})});
+ return api}};
+const P2PERR={'unavailable-id':'Essa sala já existe. Para entrar nela, use o campo de código e Entrar.','peer-unavailable':'Sala não encontrada. Confira o código (a sala só existe enquanto quem criou está com o jogo aberto).',
+ 'network':'Sem conexão com o servidor de salas. Confira a internet.','server-error':'O servidor de salas não respondeu. Tente de novo.','socket-error':'Sem conexão com o servidor de salas.',
+ 'browser-incompatible':'Este navegador não suporta o online. Use Chrome ou Edge.','tempo':'Demorou demais para conectar. Tente de novo (algumas redes bloqueiam a conexão).','sem_peerjs':'Não deu para carregar o online. Confira a internet e recarregue a página.'};
+async function joinGame(code,asHost){code=String(code||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8);if(!code){$('#onst').textContent='Digite um código de sala.';return}
+ if(!room&&!p2p){$('#onst').textContent='O modo online não está disponível aqui.';return}
  if(!nick()){$('#nick').focus();$('#onst').textContent='Escolha um apelido primeiro.';return}
  LS.set('luvas_nick',nick());{const mi=parseInt(code[0],36);setMap(mi<MAPS.length?mi:0)}$('#onst').textContent='Entrando na sala '+code+' ('+MAPS[cfg.map].n+')…';
- try{if(net.gr)await leaveGame();const g=await room.join('luvas-'+code);
+ try{if(net.gr)await leaveGame();const g=p2p?await P2P.join(code,asHost!==false):await room.join('luvas-'+code);
+  if(p2p)g.onHostLeft=()=>{if(!net.on)return;feed('O anfitrião','saiu da sala.','');setTimeout(()=>{if(net.on)toMenu();$('#onst').textContent='Quem criou a sala saiu. Crie uma sala nova ou entre em outra.'},1500)};
   Object.assign(net,{on:true,gr:g,code,ev:[],seq:0,lastSeq:{},lastDc:{},lastCo:{},co:[],coSeq:0,host:false,acc:0,dc:0,kb:null,t0:performance.now()});
-  let mp=null;try{mp=(g.peers().find(p=>p.sameTab)||{}).peer}catch(e){}net.me=mp||myPeer()||'me';startMatch();lobbyPres()}
- catch(e){$('#onst').textContent='Não deu para entrar na sala ('+(e&&e.code||'erro')+'). Tente de novo.'}}
+  let mp=null;try{mp=p2p?g.myId:(g.peers().find(p=>p.sameTab)||{}).peer}catch(e){}net.me=mp||myPeer()||'me';startMatch();lobbyPres()}
+ catch(e){if(p2p){$('#onst').textContent=P2PERR[e&&e.code]||'Não deu para conectar. Tente de novo.';return}$('#onst').textContent='Não deu para entrar na sala ('+(e&&e.code||'erro')+'). Tente de novo.'}}
 async function leaveGame(){const g=net.gr;net.on=false;net.gr=null;net.host=false;curInv=null;try{if(g)await g.leave()}catch(e){}lobbyPres()}
 const myPeer=()=>{const m=lobby.find(p=>p.sameTab);return m?m.peer:null};
 const pname=pe=>(pe.by&&names[pe.by])||(pe.presence&&pe.presence.lb&&pe.presence.lb.nm)||'Jogador';
@@ -868,7 +897,9 @@ function handshake(){if(!myId)return;let ch=false;
   if(reqs.includes(pe.by)&&((Array.isArray(lb.fr)&&lb.fr.includes(myId))||(Array.isArray(lb.req)&&lb.req.includes(myId)))){addFriend(pe.by);ch=true}}
  if(ch)renderOnline()}
 async function initOnline(){if(online)return;online=true;const st=$('#onst');
- if(!window.claude||!claude.use){st.textContent='O modo online só funciona dentro do Claude.';return}
+ if(!window.claude||!claude.use){p2p=true;st.textContent='Online por código: crie uma sala e passe o código para seus amigos, ou digite o código de um amigo e clique em Entrar.';
+  ['#incoming','#frl','#ppl'].forEach(s=>$(s).classList.add('hide'));document.querySelectorAll('#onl h3').forEach(h=>h.classList.add('hide'));
+  $('#onl .note').textContent='Seus amigos abrem o jogo pelo mesmo link, escolhem Online, digitam o código e clicam em Entrar. A sala fica aberta enquanto quem criou estiver no jogo. Em algumas redes (escola, empresa) a conexão pode ser bloqueada.';return}
  try{[room,usr,db]=await Promise.all([claude.use('room'),claude.use('user'),claude.use('db')])}catch(e){}
  if(!room){st.textContent='O modo online não está disponível para você nesta página. Os outros modos funcionam normalmente.';return}
  try{myId=usr?await usr.id():null}catch(e){myId=null}
@@ -897,9 +928,9 @@ $('#bots').addEventListener('input',e=>{cfg.bots=+e.target.value;$('#bo').textCo
 $('#go').onclick=()=>{if(cfg.mode!='online')startMatch()};
 $('#again').onclick=startMatch;$('#tomenu').onclick=toMenu;$('#tomenu2').onclick=toMenu;
 $('#resume').onclick=()=>{setPause(false);tryLock()};
-$('#mkroom').onclick=()=>joinGame(newCode());
-$('#jroom').onclick=()=>joinGame($('#rcode').value);
-$('#rcode').addEventListener('keydown',e=>{if(e.key=='Enter')joinGame($('#rcode').value)});
+$('#mkroom').onclick=()=>joinGame(newCode(),true);
+$('#jroom').onclick=()=>joinGame($('#rcode').value,false);
+$('#rcode').addEventListener('keydown',e=>{if(e.key=='Enter')joinGame($('#rcode').value,false)});
 function drawAlbum(){$('#albs').textContent=`Você já encontrou ${album.length} de 50 luvas. Toque numa luva encontrada para usá-la como padrão em toda luta. As lendárias aparecem em menos de 1 a cada 20 baús.`;
  $('#albg').innerHTML=`<button data-k="-1" class="${eq<0?'eq':''}"><i style="background:#e23b3b"></i>Luva vermelha<small>Normal, sem poderes</small>${eq<0?'<em>Usando</em>':''}</button>`+PU.map((u,i)=>album.includes(i)?`<button data-k="${i}" class="${eq===i?'eq':''}"><i style="background:${hex(u[2])}"></i>${esc(u[0])}<small class="r${u[1]}">${RAR[u[1]]}</small><small>${esc(desc(u[3]))}</small>${eq===i?'<em>Usando</em>':''}</button>`
   :`<div class="no"><i style="background:#ccc"></i>???<small class="r${u[1]}">${RAR[u[1]]}</small></div>`).join('')}

@@ -41,7 +41,7 @@ No modo **Amigo na mesma tela**, o Jogador 2 usa o controle ou o teclado: I J K 
 
 ## O que tem no jogo
 
-- **3 modos:** contra CPUs (até 30), amigo na mesma tela (tela dividida) e online com amigos.
+- **3 modos:** contra CPUs (até 30), amigo na mesma tela (tela dividida) e online com amigos por código de sala.
 - **11 mapas:** Ilha Verde (pequena) e 10 mapas gigantes: Floresta Gigante, Deserto Dourado, Montanhas Nevadas, Arquipélago Tropical, Vale do Vulcão, Campo de Flores, Cânion Vermelho, Floresta de Outono, Pântano dos Cogumelos e Terra dos Doces.
 - **Lutas por tempo:** 3, 5, 10 ou 15 minutos. Ganha quem tiver mais nocautes.
 - **50 luvas especiais** em 4 raridades (comum, rara, épica e lendária), dentro de baús que precisam de muitos socos para abrir. As mais raras ficam no alto dos morros e no meio dos lagos. As luvas encontradas podem ser escolhidas como luva padrão na Coleção.
@@ -74,9 +74,15 @@ Cada golpe seguido sem apanhar aumenta sua força em 5%, até +50%.
 3. Em **Source**, escolha a branch `main` e a pasta `/ (root)` e salve.
 4. Depois de um ou dois minutos, o jogo fica disponível em `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`.
 
-## Sobre o modo online
+## Jogar online com amigos
 
-O modo **Online com amigos** usa os recursos de sala ao vivo do Claude e só funciona quando o jogo é aberto como página do Claude. Fora do Claude (no GitHub Pages ou abrindo o arquivo direto), esse modo mostra um aviso, e os outros dois modos funcionam normalmente.
+1. Escolha **Online com amigos**, digite um apelido, escolha o mapa e clique em **Criar sala**.
+2. O código da sala aparece no canto da tela. Passe o código para seus amigos.
+3. Eles abrem o jogo pelo mesmo link, escolhem **Online com amigos**, digitam o código e clicam em **Entrar**.
+
+A conexão é direta entre os computadores (WebRTC, usando a biblioteca [PeerJS](https://peerjs.com) e o servidor gratuito dela só para os jogadores se acharem). A sala fica aberta enquanto quem criou estiver com o jogo aberto. Em algumas redes (escola, empresa, alguns 4G) a conexão pode ser bloqueada.
+
+Quando o jogo é aberto dentro do Claude, o modo online usa as salas do Claude, com lista de amigos e convites.
 
 A coleção de luvas, a luva padrão, o apelido e o último mapa escolhido ficam salvos no navegador (localStorage).
 
@@ -86,4 +92,4 @@ A coleção de luvas, a luva padrão, o apelido e o último mapa escolhido ficam
 - `manifest.webmanifest`, `sw.js`, `icon-192.png`, `icon-512.png`: arquivos que deixam o jogo instalável como aplicativo
 - `screenshot.png`: imagem do jogo usada neste README
 
-O Three.js (versão r128) e as fontes (Lilita One e Nunito) são carregados pela internet na primeira vez que o jogo é aberto.
+O Three.js (versão r128), o PeerJS (versão 1.5.4) e as fontes (Lilita One e Nunito) são carregados pela internet na primeira vez que o jogo é aberto. O modo online precisa de internet sempre.
