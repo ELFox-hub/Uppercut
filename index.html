@@ -415,28 +415,30 @@ const CB={gancho:['Gancho Duplo','soco, soco, forte','o forte dobra de força e 
  tubarao:['Tubarão','nadando rápido (Shift), soco forte','avança como um tubarão e joga para o alto'],onda:['Onda Gigante','na água: forte, forte','empurra todo mundo à sua frente'],
  redemoinho:['Redemoinho','na água: soco, forte, soco, forte','puxa e prende os adversários num redemoinho'],bolhas:['Rajada de Bolhas','na água: 4 socos','dispara 5 bolhas que atordoam'],
  golfinho:['Salto do Golfinho','pule para fora da água e dê um soco forte no ar','mergulho explosivo enorme']};
-function comboFx(p,cb){p.ca={k:cb,t:0,d:CBD[cb]};p.cbN++;p.cbK=cb;if(cb=='metra'||cb=='furacao'){if(p.human)setTimeout(()=>msg(p,'Segure o soco para continuar!'),700);else p.holdT=.2+Math.random()*2.5}burst(p.pos.clone().setY(p.pos.y+1.4*p.scl),0xffe14d,10,4);if(p.human)msg(p,CB[cb][0]+'!')}
+function sfxSwing(p,strong){const d=p.human?0:near(p);if(d<25)snd(strong?260:380,.12,'triangle',.05*(1-d/25),strong?90:160)}
+function sfxHit(p,strong){const d=p.human?0:near(p);if(d<20)snd(strong?90:140,.14,'sine',.18*(1-d/20),50)}
+function comboFx(p,cb){if(cb=='meteoro'||cb=='golfinho')sfxSwing(p,true);p.ca={k:cb,t:0,d:CBD[cb]};p.cbN++;p.cbK=cb;if(cb=='metra'||cb=='furacao'){if(p.human)setTimeout(()=>msg(p,'Segure o soco para continuar!'),700);else p.holdT=.2+Math.random()*2.5}burst(p.pos.clone().setY(p.pos.y+1.4*p.scl),0xffe14d,10,4);if(p.human)msg(p,CB[cb][0]+'!')}
 const bon=p=>1+Math.min(.5,(p.chT>0?p.ch:0)*.05);
 function regHit(p){p.ch=p.chT>0?p.ch+1:1;p.chT=2}
 function slam(p){const gf=p.slamK==='golfinho',R=gf?6.5:4.5,D=gf?30:22;ring(p.pos.x,p.pos.z,gf?0x4fc3ff:0xffe14d);burst(p.pos.clone().setY(p.pos.y+.3),gf?0xbfeaff:0xd9c9a0,gf?30:18,gf?9:7);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);if(near(p)<30)snd(80,.35,'sine',.22,40);
  for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez);
-  if(el<R*p.scl&&Math.abs(o.pos.y-p.pos.y)<2.5){deliver(o,p,{d:D*p.M.d*bon(p),kx:ex/(el||1)*8,kz:ez/(el||1)*8,f:16|128});regHit(p)}}}
+  if(el<R*p.scl&&Math.abs(o.pos.y-p.pos.y)<2.5){deliver(o,p,{d:D*p.M.d*bon(p),kx:ex/(el||1)*8,kz:ez/(el||1)*8,f:16|128});regHit(p);sfxHit(p,true)}}}
 function splash(p){const q=new V3(p.pos.x,WATER+.1,p.pos.z);burst(q,0xffffff,10,5);burst(q,0x7fd0ff,10,4)}
-function waveHit(p){const m=p.M,f=fw(p);for(let i=1;i<=4;i++)burst(new V3(p.pos.x+f[0]*i*2,WATER+.2,p.pos.z+f[1]*i*2),0xbfeaff,10,5);
+function waveHit(p){const m=p.M,f=fw(p);sfxSwing(p,true);for(let i=1;i<=4;i++)burst(new V3(p.pos.x+f[0]*i*2,WATER+.2,p.pos.z+f[1]*i*2),0xbfeaff,10,5);
  ring(p.pos.x+f[0]*4,p.pos.z+f[1]*4,0x4fc3ff);netPush(['w',r2(p.pos.x+f[0]*4),r2(p.pos.z+f[1]*4)],p);if(near(p)<30)snd(120,.4,'sawtooth',.06,60);
  for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez);if(el>8.5||el<.01||(ex*f[0]+ez*f[1])/el<.45)continue;
-  deliver(o,p,{d:16*m.d*bon(p),kx:f[0]*16,kz:f[1]*16,f:16});regHit(p)}}
+  deliver(o,p,{d:16*m.d*bon(p),kx:f[0]*16,kz:f[1]*16,f:16});regHit(p);sfxHit(p,true)}}
 const bubG=new THREE.SphereGeometry(.35,10,8),bubM=new THREE.MeshLambertMaterial({color:0xbfeaff,transparent:true,opacity:.6,emissive:0x2a6a8a});
-function bubbles(p,visual,o,yaw){const y0=yaw==null?p.yaw:yaw;
+function bubbles(p,visual,o,yaw){const y0=yaw==null?p.yaw:yaw;if(!visual)sfxSwing(p,false);
  for(let i=-2;i<=2;i++){const a=y0+i*.16,dir=new V3(-Math.sin(a),0,-Math.cos(a)),m=new THREE.Mesh(bubG,bubM);
   if(o)m.position.copy(o);else m.position.set(p.pos.x,p.pos.y+1.1*p.scl,p.pos.z);m.position.addScaledVector(dir,.8);S.add(m);
   RK.push({m,v:dir.multiplyScalar(16),o:p,l:1.3,visual,d:6*p.M.d,kb:1.5,f:4,st:.8,col:0xbfeaff})}
  if(!visual&&p.kind=='me')netPush(['B',r2(p.pos.x),r2(p.pos.y+1.1*p.scl),r2(p.pos.z),r3(y0)],p);if(near(p)<30)snd(600,.2,'sine',.05,1200)}
-function spinHit(p,mult){const m=p.M;ring(p.pos.x,p.pos.z,0xffffff);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);let n=0;{
+function spinHit(p,mult){const m=p.M;sfxSwing(p,true);ring(p.pos.x,p.pos.z,0xffffff);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);let n=0;{
   for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez);
    if(el-.45*o.scl<3.3*m.r&&Math.abs(o.pos.y-p.pos.y)<2.2){deliver(o,p,{d:20*m.d*.75*mult*bon(p),kx:ex/(el||1)*7,kz:ez/(el||1)*7,f:16});regHit(p);n++;burst(o.pos.clone().setY(o.pos.y+1.2),0xffffff,8)}}
   for(const c of chests)if(Math.hypot(c.x-p.pos.x,c.z-p.pos.z)<3.3)hitChest(c,2,p);
-  if(n&&p.human){const h=p.hud.hit;h.classList.add('on');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('on'),130);snd(90,.16,'sine',.2,50)}}}
+  if(n&&p.human){const h=p.hud.hit;h.classList.add('on');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('on'),130)}if(n)sfxHit(p,true)}}
 function strike(p,strong,mult,second,cb){const m=p.M,f=fw(p),rng=2.3*m.r*(p.scl>1?1.25:1)*(strong?1.15:1);
  if(cb=='furacao'){p.spinA={t:0,next:.4};spinHit(p,1);return}
  if(cb=='onda'){waveHit(p);return}
@@ -515,7 +517,7 @@ function spawnChest(){let t=Math.random()*100,rar=0;for(let i=0;i<4;i++){if(t<RW
 function dropChest(i,fx){const c=chests[i];if(fx){burst(new V3(c.x,c.y+1,c.z),RCOL[c.rar],24,8);burst(new V3(c.x,c.y+1,c.z),0xffd34d,14,6)}S.remove(c.g);chests.splice(i,1)}
 function clearChests(){while(chests.length)dropChest(0);chestTimers=[]}
 const authority=()=>!net.on||net.host;
-function hitChest(c,n,p){c.shake=.25;burst(new V3(c.x,c.y+.8,c.z),0xffd34d,5,3);if(p.human)snd(500,.08,'square',.06,250);
+function hitChest(c,n,p){c.shake=.25;burst(new V3(c.x,c.y+.8,c.z),0xffd34d,5,3);
  if(authority())chestDamage(c,n,p.id);else netPush(['c',c.id,n],p)}
 function chestDamage(c,n,oid){if(c.hp<=0||!chests.includes(c))return;c.hp-=n;drawLab(c);
  if(c.hp<=0){const rar=c.rar,cand=PU.map((u,i)=>i).filter(i=>PU[i][1]===rar),k=cand[Math.floor(Math.random()*cand.length)];
@@ -698,12 +700,12 @@ function update(dt){
   if(!p.dead&&p.pend){p.pend.t-=dt;if(p.pend.t<=0){const s=p.pend.strong,cb=p.pend.cb;p.pend=null;strike(p,s,1,false,cb)}}
   p.chT-=dt;if(p.chT<=0)p.ch=0;p.cntT-=dt;
   p.leapT=(p.leapT||0)-dt;
-  if(!p.dead&&p.whirl){const w=p.whirl;w.t+=dt;if(w.t>=w.next){w.next+=.3;ring(w.x,w.z,0x4fc3ff);burst(new V3(w.x,WATER+.2,w.z),0xbfeaff,8,4);netPush(['w',r2(w.x),r2(w.z)],p);
-    for(const o of P){if(o===p||o.dead)continue;const ex=w.x-o.pos.x,ez=w.z-o.pos.z,el=Math.hypot(ex,ez);if(el<6.5){deliver(o,p,{d:4*p.M.d*bon(p),kx:ex/(el||1)*5,kz:ez/(el||1)*5,f:4,st:.4});regHit(p)}}}
+  if(!p.dead&&p.whirl){const w=p.whirl;w.t+=dt;if(w.t>=w.next){w.next+=.3;sfxSwing(p,true);ring(w.x,w.z,0x4fc3ff);burst(new V3(w.x,WATER+.2,w.z),0xbfeaff,8,4);netPush(['w',r2(w.x),r2(w.z)],p);
+    for(const o of P){if(o===p||o.dead)continue;const ex=w.x-o.pos.x,ez=w.z-o.pos.z,el=Math.hypot(ex,ez);if(el<6.5){deliver(o,p,{d:4*p.M.d*bon(p),kx:ex/(el||1)*5,kz:ez/(el||1)*5,f:4,st:.4});regHit(p);sfxHit(p,false)}}}
    if(w.t>=2.4)p.whirl=null}
   if(!p.dead&&p.spinA){p.spinA.t+=dt;if(p.spinA.t>=p.spinA.next){p.spinA.next+=.4;spinHit(p,.8)}if(p.spinA.t>=1&&(!p.hold||p.spinA.t>=5))p.spinA=null}
   if(!p.human){p.holdT=(p.holdT||0)-dt;p.hold=p.holdT>0}
-  if(!p.dead&&p.flurry){p.flurry.t-=dt;if(p.flurry.t<=0){p.flurry.el+=.1;p.flurry.t=.1;p.ph^=1;p.pS=0;p.pnD=p.pnT=.1;p.pn++;strike(p,false,.4,true,'flurry');if(p.flurry&&p.flurry.el>=.6&&(!p.hold||p.flurry.el>=4))p.flurry=null}}
+  if(!p.dead&&p.flurry){p.flurry.t-=dt;if(p.flurry.t<=0){p.flurry.el+=.1;p.flurry.t=.1;sfxSwing(p,false);p.ph^=1;p.pS=0;p.pnD=p.pnT=.1;p.pn++;strike(p,false,.4,true,'flurry');if(p.flurry&&p.flurry.el>=.6&&(!p.hold||p.flurry.el>=4))p.flurry=null}}
   if(!p.dead&&p.multi){p.multi.t-=dt;if(p.multi.t<=0){const s=p.multi.strong;p.multi=null;strike(p,s,.6,true)}}
   if(p.human)human(p,dt);else if(!p.dead)bot(p,dt);
   if(p.dead){p.rt-=dt;if(p.hud)p.hud.dead.innerHTML=`Nocaute!<small>Voltando em ${Math.max(1,Math.ceil(p.rt))}…</small>`;if(p.rt<=0)spawn(p)}}
