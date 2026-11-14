@@ -1,0 +1,15 @@
+{
+  "name": "Uppercut!",
+  "short_name": "Uppercut",
+  "description": "Jogo de boxe 3D em primeira pessoa com mapas gigantes, luvas especiais e combos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#8fd3ff",
+  "theme_color": "#e23b3b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

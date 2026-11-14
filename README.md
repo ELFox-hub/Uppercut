@@ -1,4 +1,4 @@
-# Arena das Luvas
+# Uppercut!
 
 Jogo de boxe em primeira pessoa num mapa aberto, feito com Three.js. Você luta contra CPUs ou contra um amigo na mesma tela, abre baús escondidos e coleciona 50 luvas especiais.
 
@@ -6,7 +6,17 @@ Jogo de boxe em primeira pessoa num mapa aberto, feito com Three.js. Você luta 
 
 ## Como jogar
 
-Abra o `index.html` no navegador (Chrome, Edge ou Firefox). Não precisa instalar nada.
+Abra o link do GitHub Pages, ou abra o `index.html` no navegador (Chrome, Edge ou Firefox). Não precisa instalar nada.
+
+### Instalar como aplicativo
+
+Pelo link do GitHub Pages, o jogo pode ser instalado e ganha ícone próprio:
+
+- **Chrome ou Edge no computador:** clique no ícone de instalar na barra de endereço (um monitor com uma setinha) ou abra o menu ⋮ e escolha **Instalar Uppercut!**.
+- **Android:** no Chrome, abra o menu ⋮ e toque em **Instalar app** ou **Adicionar à tela inicial**.
+- **iPhone/iPad:** no Safari, toque em Compartilhar e depois em **Adicionar à Tela de Início**.
+
+Depois de aberto uma vez, o jogo também funciona sem internet.
 
 Também dá para rodar com um servidor local:
 
@@ -73,6 +83,7 @@ A coleção de luvas, a luva padrão, o apelido e o último mapa escolhido ficam
 ## Arquivos
 
 - `index.html`: o jogo inteiro (HTML, CSS e JavaScript num arquivo só)
+- `manifest.webmanifest`, `sw.js`, `icon-192.png`, `icon-512.png`: arquivos que deixam o jogo instalável como aplicativo
 - `screenshot.png`: imagem do jogo usada neste README
 
-O Three.js (versão r128) e as fontes (Lilita One e Nunito) são carregados pela internet, então é preciso estar conectado para jogar.
+O Three.js (versão r128) e as fontes (Lilita One e Nunito) são carregados pela internet na primeira vez que o jogo é aberto.
