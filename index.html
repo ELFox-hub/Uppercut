@@ -204,7 +204,7 @@ const r2=v=>Math.round(v*100)/100,r3=v=>Math.round(v*1000)/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const cv=$('#c');
-const TOUCH=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)||(('ontouchstart' in window)&&navigator.maxTouchPoints>0);if(TOUCH)document.body.classList.add('touch');
+const TOUCH=!!(window.matchMedia&&matchMedia('(pointer: coarse)').matches);if(TOUCH)document.body.classList.add('touch');
 const R=new THREE.WebGLRenderer({canvas:cv,antialias:!TOUCH});
 R.setPixelRatio(TOUCH?1:Math.min(devicePixelRatio,1.5));R.setSize(innerWidth,innerHeight);R.setScissorTest(true);
 const S=new THREE.Scene(),SKY=0x8fd3ff;
