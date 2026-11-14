@@ -24,6 +24,10 @@ Também dá para rodar com um servidor local:
 npx serve .
 ```
 
+### No celular
+
+O jogo funciona no celular com o aparelho deitado: joystick à esquerda para andar (empurre até a borda para correr), arraste no lado direito da tela para olhar e use os botões **Soco**, **Forte**, **Defesa** (segure) e **Pular**. O botão **II** pausa. No celular os mapas gigantes têm menos árvores e pedras para o jogo ficar mais leve.
+
 ### Controles
 
 | Ação | Teclado e mouse | Controle de videogame |

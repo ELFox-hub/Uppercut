@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Uppercut!</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#e23b3b">
@@ -102,6 +102,29 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 .cmb small{display:block;font:800 14px Nunito,sans-serif;color:#fff;margin-top:4px}
 .cmb.bump{animation:bump .25s ease-out}@keyframes bump{0%{transform:scale(1.35)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.cmb.bump{animation:none}}
+/* celular */
+#tc{position:fixed;inset:0;z-index:4;pointer-events:none;touch-action:none;user-select:none;-webkit-user-select:none}
+#tlook{position:absolute;left:40%;right:0;top:0;bottom:0;pointer-events:auto;touch-action:none}
+#joyz{position:absolute;left:0;bottom:0;width:40%;height:65%;pointer-events:auto;touch-action:none}
+#joy{position:absolute;left:max(24px,env(safe-area-inset-left));bottom:28px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.55)}
+#knob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 3px 8px rgba(0,0,0,.3)}
+#tbtns{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:18px;width:230px;height:210px;pointer-events:none}
+.tb{position:absolute;pointer-events:auto;touch-action:none;border:3px solid rgba(255,255,255,.8);border-radius:50%;color:#fff;font:400 15px 'Lilita One',sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.5);background:rgba(16,38,28,.45);width:66px;height:66px;padding:0}
+.tb.on{transform:scale(.92);filter:brightness(1.3)}
+.t1{right:0;bottom:0;width:96px;height:96px;font-size:20px;background:rgba(226,59,59,.8)}
+.t2{right:104px;bottom:6px;background:rgba(255,122,26,.75)}.t3{right:20px;bottom:108px;background:rgba(30,107,255,.7)}.t4{right:112px;bottom:92px;background:rgba(46,204,113,.7)}
+#tpause{position:absolute;right:max(12px,env(safe-area-inset-right));top:10px;width:44px;height:44px;border-radius:12px;border:0;background:rgba(16,38,28,.72);color:#fff;font:800 16px Nunito,sans-serif;pointer-events:auto}
+#rot{position:fixed;inset:0;z-index:9;display:none;place-items:center;align-content:center;gap:6px;text-align:center;background:#1e6bff;color:#fff;font:600 16px Nunito,sans-serif;padding:24px}
+#rot b{display:block;font:400 30px 'Lilita One',sans-serif}
+@media (orientation:portrait){body.touch.playing #rot{display:grid}}
+body.touch .mini{left:12px;top:10px;bottom:auto;width:92px;height:92px;border-width:2px}
+body.touch .info{left:12px;top:108px;bottom:auto}body.touch .hpbar{width:110px;height:14px}body.touch .hpn{font-size:18px}
+body.touch .pu{right:auto;left:50%;transform:translateX(-50%);top:64px;bottom:auto;min-width:0;padding:4px 10px}body.touch .pu b{font-size:15px}
+body.touch .cmb{right:auto;left:16px;top:44%}body.touch .rmc{left:auto;right:64px;top:12px}
+body.touch #feed{top:60px}body.touch .sts{bottom:auto;top:calc(50% - 60px)}body.touch .toast{top:100px}
+body.touch #board{max-width:58vw}body.touch #board span{font-size:12px;padding:2px 8px}
+body.touch #mode button[data-v=duo]{display:none}
+.ov{touch-action:auto}
 .dead{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:rgba(226,59,59,.3);font:400 clamp(24px,4vw,40px)/1.15 'Lilita One',sans-serif}
 .dead small{display:block;font:800 16px Nunito,sans-serif;margin-top:6px}
 .rmc{position:absolute;left:18px;top:14px;font-weight:800;font-size:14px;background:rgba(16,38,28,.72);border-radius:10px;padding:4px 10px}
@@ -119,6 +142,12 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 <div id="hud"></div>
 <div id="board" class="hide"></div>
 <div id="feed"></div>
+<div id="tc" class="hide">
+  <div id="tlook"></div><div id="joyz"><div id="joy"><i id="knob"></i></div></div>
+  <div id="tbtns"><button class="tb t1" data-k="pa">Soco</button><button class="tb t2" data-k="ps">Forte</button><button class="tb t3" data-k="bl">Defesa</button><button class="tb t4" data-k="jp">Pular</button></div>
+  <button id="tpause" aria-label="Pausar">II</button>
+</div>
+<div id="rot"><b>Vire o celular</b>O jogo funciona com o celular deitado.</div>
 
 <div id="menu" class="ov"><div class="card">
   <h1>Upper<span>cut!</span></h1>
@@ -144,7 +173,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
   <div class="acts"><button class="btn" id="albb">Coleção de luvas 0/50</button></div>
   <h3>Controles</h3>
   <div id="ctl" class="ctl"></div>
-  <p class="note" id="padn">Precisa de teclado e mouse. Controles de videogame (Xbox/PlayStation) também funcionam.</p>
+  <p class="note" id="padn">Funciona com teclado e mouse, controle de videogame (Xbox/PlayStation) ou na tela do celular.</p>
 </div></div>
 
 <div id="album" class="ov hide"><div class="card">
@@ -175,10 +204,11 @@ const r2=v=>Math.round(v*100)/100,r3=v=>Math.round(v*1000)/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const cv=$('#c');
-const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-R.setPixelRatio(Math.min(devicePixelRatio,1.5));R.setSize(innerWidth,innerHeight);R.setScissorTest(true);
+const TOUCH=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)||(('ontouchstart' in window)&&navigator.maxTouchPoints>0);if(TOUCH)document.body.classList.add('touch');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:!TOUCH});
+R.setPixelRatio(TOUCH?1:Math.min(devicePixelRatio,1.5));R.setSize(innerWidth,innerHeight);R.setScissorTest(true);
 const S=new THREE.Scene(),SKY=0x8fd3ff;
-S.background=new THREE.Color(SKY);S.fog=new THREE.Fog(SKY,60,200);
+S.background=new THREE.Color(SKY);S.fog=new THREE.Fog(SKY,TOUCH?45:60,TOUCH?150:200);
 S.add(new THREE.HemisphereLight(0xe6f6ff,0x58783a,.95));
 const sun=new THREE.DirectionalLight(0xfff0d0,.75);sun.position.set(60,100,30);S.add(sun);
 
@@ -229,7 +259,7 @@ function inst(geo,mat,list){if(!list.length)return;const m=new THREE.InstancedMe
 function buildWorld(mi){if(mi===MI)return;MI=mi;MAP=MAPS[mi]||MAPS[0];seed=11+mi*7919;
  if(world){S.remove(world);world.children.forEach(o=>{if(o.isInstancedMesh)o.dispose&&o.dispose();if(o.userData.own)o.geometry.dispose()})}
  world=new THREE.Group();S.add(world);
- L=MAP.L;LIM=L-5;WATER=MAP.wl;BIG=L>200;CHN=BIG?36:8;const hf=MAP.h;
+ L=MAP.L;LIM=L-5;WATER=MAP.wl;BIG=L>200;CHN=BIG?(TOUCH?26:36):8;const hf=MAP.h;
  H=(x,z)=>{let h=hf(x,z);if(h<WATER)h=WATER-(WATER-h)*3.2;const d=Math.max(Math.abs(x),Math.abs(z));if(d>L-15)h+=(d-(L-15))**2*.08;return h};
  S.background.setHex(MAP.sky);S.fog.color.setHex(MAP.sky);
  GO=L+30;GN=Math.ceil(2*GO/CS);grid=Array.from({length:GN*GN},()=>[]);obs=[];
@@ -240,7 +270,7 @@ function buildWorld(mi){if(mi===MI)return;MI=mi;MAP=MAPS[mi]||MAPS[0];seed=11+mi
  const gm=new THREE.Mesh(tg,new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1}));gm.userData.own=1;world.add(gm);
  wat=new THREE.Mesh(new THREE.PlaneGeometry(size,size),new THREE.MeshLambertMaterial({color:MAP.wc,transparent:true,opacity:MAP.wo||.72}));
  wat.userData.own=1;wat.rotation.x=-PI/2;wat.position.y=WATER;world.add(wat);
- const dn=MAP.dens,hb=[],hr=[],hd=[];
+ const dn0=MAP.dens,dk=TOUCH&&BIG?.5:1,dn={t:Math.round(dn0.t*dk),r:Math.round(dn0.r*dk),c:Math.round(dn0.c*dk),h:dn0.h,f:Math.round(dn0.f*(TOUCH?.35:1))},hb=[],hr=[],hd=[];
  for(let i=0;i<dn.h;i++){const w=6+rnd()*5,d=6+rnd()*4,q=place(Math.max(w,d)/2+4);if(!q)continue;const[x,z]=q,y=H(x,z);
   hb.push({x,y:y+1.5,z,sx:w,sy:8,sz:d,c:MAP.hc[i%MAP.hc.length]});hr.push({x,y:y+7,z,sx:w+1.2,sy:1,sz:d+1.2,ry:PI/4});hd.push({x,y:y+1.2,z:z+d/2+.02,sx:1.4,sy:2.4,sz:.1});
   addObs({t:'b',x0:x-w/2,x1:x+w/2,z0:z-d/2,z1:z+d/2,top:y+8.5})}
@@ -558,18 +588,41 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName=='INPUT')return;key
  if(e.code=='Escape'&&running&&!locked&&performance.now()-lostAt>400)setPause(!paused)});
 addEventListener('keyup',e=>keys[e.code]=false);
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;mL=mR=false});
-function tryLock(){try{const r=cv.requestPointerLock();if(r&&r.catch)r.catch(()=>{})}catch(e){}}
+function tryFull(){if(!TOUCH)return;try{const d=document.documentElement,r=d.requestFullscreen&&!document.fullscreenElement?d.requestFullscreen({navigationUI:'hide'}):null;
+ const lk=()=>{try{const o=screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape');if(o&&o.catch)o.catch(()=>{})}catch(e){}};if(r&&r.then)r.then(lk).catch(()=>{});else lk()}catch(e){}}
+function tryLock(){if(TOUCH){tryFull();return}try{const r=cv.requestPointerLock();if(r&&r.catch)r.catch(()=>{})}catch(e){}}
 document.addEventListener('pointerlockchange',()=>{const was=locked;locked=document.pointerLockElement===cv;if(was&&!locked&&running){lostAt=performance.now();setPause(true)}});
 cv.addEventListener('mousedown',e=>{if(!running||paused)return;if(!locked)tryLock();if(e.button==0)mL=true;if(e.button==2)mR=true});
 addEventListener('mouseup',e=>{if(e.button==0)mL=false;if(e.button==2)mR=false});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 addEventListener('mousemove',e=>{if(running&&locked){mdx+=e.movementX;mdy+=e.movementY}});
+/* ---------- toque (celular) ---------- */
+const TS={mx:0,mz:0,dx:0,dy:0,pa:false,ps:false,bl:false,jp:false,run:false};
+{let joyId=null,lookId=null,lx=0,ly=0,jc=[0,0];const knob=$('#knob'),joy=$('#joy');
+ const jr=()=>{const r=joy.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2,r.width/2]};
+ const jmove=e=>{const[cx,cy,R]=jr();let dx=e.clientX-cx,dy=e.clientY-cy;const m=Math.hypot(dx,dy),k=m>R?R/m:1;dx*=k;dy*=k;
+  knob.style.transform=`translate(${dx}px,${dy}px)`;TS.mx=dx/R;TS.mz=-dy/R;TS.run=m>R*.95};
+ const jend=()=>{joyId=null;TS.mx=TS.mz=0;TS.run=false;knob.style.transform=''};
+ $('#joyz').addEventListener('pointerdown',e=>{e.preventDefault();joyId=e.pointerId;try{e.target.setPointerCapture(e.pointerId)}catch(x){}jmove(e)});
+ $('#joyz').addEventListener('pointermove',e=>{if(e.pointerId===joyId)jmove(e)});
+ ['pointerup','pointercancel'].forEach(t=>$('#joyz').addEventListener(t,e=>{if(e.pointerId===joyId)jend()}));
+ $('#tlook').addEventListener('pointerdown',e=>{e.preventDefault();lookId=e.pointerId;lx=e.clientX;ly=e.clientY;try{e.target.setPointerCapture(e.pointerId)}catch(x){}});
+ $('#tlook').addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;TS.dx+=e.clientX-lx;TS.dy+=e.clientY-ly;lx=e.clientX;ly=e.clientY});
+ ['pointerup','pointercancel'].forEach(t=>$('#tlook').addEventListener(t,e=>{if(e.pointerId===lookId)lookId=null}));
+ document.querySelectorAll('#tbtns .tb').forEach(b=>{const k=b.dataset.k;
+  b.addEventListener('pointerdown',e=>{e.preventDefault();TS[k]=true;b.classList.add('on');try{b.setPointerCapture(e.pointerId)}catch(x){}});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>b.addEventListener(t,()=>{TS[k]=false;b.classList.remove('on')}))});
+ $('#tpause').addEventListener('click',()=>{if(running)setPause(true)});
+ $('#tc').addEventListener('contextmenu',e=>e.preventDefault())}
+let tuiOn=null;
+function touchUI(){const on=running&&!paused&&!inMenu&&$('#end').classList.contains('hide');if(on!==tuiOn){tuiOn=on;$('#tc').classList.toggle('hide',!on);document.body.classList.toggle('playing',on);if(!on){for(const k in TS)TS[k]=typeof TS[k]=='boolean'?false:0;$('#knob').style.transform=''}}}
 const pad=()=>{const g=navigator.getGamepads?[...navigator.getGamepads()].filter(Boolean):[];return g[0]||null};
 addEventListener('gamepadconnected',()=>{$('#padn').textContent='Controle de videogame conectado! No modo amigo na mesma tela, ele é do Jogador 2.'});
 function human(p,dt){let mx=0,mz=0,lx=0,ly=0,pa=false,ps=false,jump=false,sprint=false,blk=false;const duo=cfg.mode=='duo';
- if(p.kind=='me'){mz=(keys.KeyW?1:0)-(keys.KeyS?1:0);mx=(keys.KeyD?1:0)-(keys.KeyA?1:0);p.yaw-=mdx*.0025;p.pitch-=mdy*.0025;mdx=mdy=0;
+ if(p.kind=='me'&&TOUCH){mx+=TS.mx;mz+=TS.mz;p.yaw-=TS.dx*.0055;p.pitch-=TS.dy*.0045;TS.dx=TS.dy=0;pa=TS.pa;ps=TS.ps;blk=TS.bl;jump=TS.jp;sprint=TS.run}
+ if(p.kind=='me'){mz+=(keys.KeyW?1:0)-(keys.KeyS?1:0);mx+=(keys.KeyD?1:0)-(keys.KeyA?1:0);p.yaw-=mdx*.0025;p.pitch-=mdy*.0025;mdx=mdy=0;
   if(!duo){lx=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);ly=(keys.ArrowUp?1:0)-(keys.ArrowDown?1:0)}
-  pa=mL||(!duo&&keys.KeyF);ps=mR||(!duo&&keys.KeyG);jump=keys.Space;sprint=keys.ShiftLeft;blk=keys.KeyQ||(!duo&&keys.KeyC)}
+  pa=pa||mL||(!duo&&keys.KeyF);ps=ps||mR||(!duo&&keys.KeyG);jump=jump||keys.Space;sprint=sprint||keys.ShiftLeft;blk=blk||keys.KeyQ||(!duo&&keys.KeyC)}
  else{mz=(keys.KeyI?1:0)-(keys.KeyK?1:0);mx=(keys.KeyL?1:0)-(keys.KeyJ?1:0);lx=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);ly=(keys.ArrowUp?1:0)-(keys.ArrowDown?1:0);
   pa=keys.Enter||keys.NumpadEnter;ps=keys.ShiftRight;jump=keys.KeyO;blk=keys.KeyP}
  const g=pad();
@@ -743,7 +796,7 @@ function draw(dt){const w=innerWidth,h=innerHeight,hs=humans();
  hs.forEach((p,k)=>{let x=0,y=0,vw=w,vh=h;if(n>1){if(side){vw=w/2;x=k*vw}else{vh=h/2;y=h-(k+1)*vh}}
   p.cam.aspect=vw/vh;p.cam.updateProjectionMatrix();R.setViewport(x,y,vw,vh);R.setScissor(x,y,vw,vh);
   for(const o of P)o.grp.visible=o!==p&&!o.dead&&(o.pos.x-p.pos.x)**2+(o.pos.z-p.pos.z)**2<210*210;R.render(S,p.cam)});for(const o of P)o.grp.visible=!o.dead}
-function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;
+function loop(now){requestAnimationFrame(loop);if(TOUCH)touchUI();const dt=Math.min(.05,(now-last)/1000);last=now;
  if(running&&(!paused||net.on))update(dt);draw(dt)}
 requestAnimationFrame(loop);
 addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);layoutHud()});
@@ -922,16 +975,17 @@ const CTL={cpu:`<div><b>Teclado e mouse</b><kbd>W A S D</kbd> andar · <kbd>Mous
  <div><b>Jogador 2 (direita)</b>Controle: <kbd>RT</kbd> soco, <kbd>RB</kbd> soco forte, <kbd>LT</kbd> defender, <kbd>A</kbd> pular. Teclado: <kbd>I J K L</kbd> andar · <kbd>Setas</kbd> olhar · <kbd>Enter</kbd> soco · <kbd>Shift dir.</kbd> forte · <kbd>P</kbd> defender · <kbd>O</kbd> pular</div>`};
 {const cc=`<div><b>Combos</b>${Object.values(CB).map(c=>`<strong>${c[0]}</strong>: ${c[1]} (${c[2]})`).join('<br>')}<br>Cada golpe seguido sem apanhar aumenta sua força, até +50%.</div>`;CTL.cpu+=cc;CTL.duo+=cc}
 CTL.online=CTL.cpu;
+CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div><b>Combos[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
 function modeUI(){const m=cfg.mode,duo=m=='duo',r=$('#bots');$('#offrows').classList.toggle('hide',m=='online');$('#onl').classList.toggle('hide',m!='online');
  r.min=duo?0:1;if(duo&&cfg.bots==4)cfg.bots=0;if(!duo&&cfg.bots<1)cfg.bots=4;r.value=cfg.bots;$('#bo').textContent=cfg.bots;
- r.previousElementSibling.firstChild.textContent=duo?'CPUs extras ':'CPUs na arena ';$('#ctl').innerHTML=CTL[m];if(m=='online'){initOnline();renderOnline()}}
+ r.previousElementSibling.firstChild.textContent=duo?'CPUs extras ':'CPUs na arena ';$('#ctl').innerHTML=TOUCH?CTL.touch:CTL[m];if(m=='online'){initOnline();renderOnline()}}
 seg('mode','mode');seg('diff','diff');seg('mins','mins',true);
 $('#bots').addEventListener('input',e=>{cfg.bots=+e.target.value;$('#bo').textContent=cfg.bots});
 $('#go').onclick=()=>{if(cfg.mode!='online')startMatch()};
 $('#again').onclick=startMatch;$('#tomenu').onclick=toMenu;$('#tomenu2').onclick=toMenu;
 $('#resume').onclick=()=>{setPause(false);tryLock()};
-$('#mkroom').onclick=()=>joinGame(newCode(),true);
-$('#jroom').onclick=()=>joinGame($('#rcode').value,false);
+$('#mkroom').onclick=()=>{tryFull();joinGame(newCode(),true)};
+$('#jroom').onclick=()=>{tryFull();joinGame($('#rcode').value,false)};
 $('#rcode').addEventListener('keydown',e=>{if(e.key=='Enter')joinGame($('#rcode').value,false)});
 function drawAlbum(){$('#albs').textContent=`Você já encontrou ${album.length} de 50 luvas. Toque numa luva encontrada para usá-la como padrão em toda luta. As lendárias aparecem em menos de 1 a cada 20 baús.`;
  $('#albg').innerHTML=`<button data-k="-1" class="${eq<0?'eq':''}"><i style="background:#e23b3b"></i>Luva vermelha<small>Normal, sem poderes</small>${eq<0?'<em>Usando</em>':''}</button>`+PU.map((u,i)=>album.includes(i)?`<button data-k="${i}" class="${eq===i?'eq':''}"><i style="background:${hex(u[2])}"></i>${esc(u[0])}<small class="r${u[1]}">${RAR[u[1]]}</small><small>${esc(desc(u[3]))}</small>${eq===i?'<em>Usando</em>':''}</button>`
