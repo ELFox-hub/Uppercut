@@ -207,9 +207,10 @@ body.touch #mode button[data-v=duo]{display:none}
     <div><canvas id="pv" width="600" height="760"></canvas><div class="acts"><button class="btn" id="lkrand">Aleatório</button></div></div>
     <div>
       <h2>Seu lutador</h2>
-      <div class="seg" id="lktab"><button data-t="h" aria-pressed="true">Cabelo</button><button data-t="o" aria-pressed="false">Roupa</button><button data-t="c" aria-pressed="false">Cores</button></div>
+      <div class="seg" id="lktab"><button data-t="h" aria-pressed="true">Cabelo</button><button data-t="o" aria-pressed="false">Roupa</button><button data-t="a" aria-pressed="false">Acessórios</button><button data-t="c" aria-pressed="false">Cores</button></div>
       <div id="lkh" class="lkp"><div class="seg sm" id="lkf"><button data-f="a" aria-pressed="true">Todos</button><button data-f="m" aria-pressed="false">Meninos</button><button data-f="f" aria-pressed="false">Meninas</button></div><div class="lgrid" id="lkhg"></div></div>
       <div id="lko" class="lkp hide"><div class="lgrid" id="lkog"></div></div>
+      <div id="lka" class="lkp hide"><p class="note" style="margin:0 0 6px">Use quantos quiser: toque para colocar ou tirar.</p><div class="lgrid" id="lkag"></div></div>
       <div id="lkc" class="lkp hide"><div class="lbl">Pele</div><div class="sw" id="sws"></div><div class="lbl">Cor do cabelo</div><div class="sw" id="swh"></div><div class="lbl">Cor da roupa</div><div class="sw" id="swo"></div></div>
       <button class="big" id="lkok">Pronto</button>
     </div>
@@ -483,8 +484,10 @@ function stripeTex(c1,c2){const k=c1+'_'+c2;if(texCache[k])return texCache[k];co
 function numTex(){if(texCache.n)return texCache.n;const cv=document.createElement('canvas');cv.width=64;cv.height=64;const g=cv.getContext('2d');
  if(g){g.font='900 46px Nunito,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('10',32,48)}return texCache.n=new THREE.CanvasTexture(cv)}
 function randLook(n){let s=(n*9301+49297)%233280||7;const r=()=>(s=s*16807%2147483647)/2147483647;
- return{h:Math.floor(r()*HAIRS.length),hc:Math.floor(r()*8),sk:Math.floor(r()*SKIN.length),o:Math.floor(r()*OUT.length),oc:Math.floor(r()*OC.length)}}
-function normLook(l){const n=(v,m,d)=>Number.isInteger(+v)&&+v>=0&&+v<m?+v:d;l=l||{};return{h:n(l.h,HAIRS.length,3),hc:n(l.hc,HC.length,0),sk:n(l.sk,SKIN.length,2),o:n(l.o,OUT.length,0),oc:n(l.oc,OC.length,0)}}
+ const lk={h:Math.floor(r()*HAIRS.length),hc:Math.floor(r()*8),sk:Math.floor(r()*SKIN.length),o:Math.floor(r()*OUT.length),oc:Math.floor(r()*OC.length),ac:0};
+ for(let b=0;b<10;b++)if(r()<[.4,.15,.1,.1,.12,.1,.06,.06,.12,.08][b])lk.ac|=1<<b;if((lk.ac&4)&&(lk.ac&8))lk.ac&=~8;return lk}
+const ACC=['Bochechas rosadas','Sardas','Óculos','Óculos escuros','Faixa de suor','Curativo','Medalha de ouro','Cinturão de campeão','Brincos','Pintura de guerreiro'];
+function normLook(l){const n=(v,m,d)=>Number.isInteger(+v)&&+v>=0&&+v<m?+v:d;l=l||{};return{h:n(l.h,HAIRS.length,3),hc:n(l.hc,HC.length,0),sk:n(l.sk,SKIN.length,2),o:n(l.o,OUT.length,0),oc:n(l.oc,OC.length,0),ac:n(l.ac,1<<ACC.length,0)}}
 const toonGrad=(()=>{const t=new THREE.DataTexture(new Uint8Array([110,190,255]),3,1,THREE.LuminanceFormat);t.minFilter=t.magFilter=THREE.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;return t})();
 const TM=(c,o)=>new THREE.MeshToonMaterial(Object.assign({color:c,gradientMap:toonGrad},o||{}));
 const shade=(c,k)=>new THREE.Color(c).multiplyScalar(k).getHex(),tint=(c,k)=>new THREE.Color(c).lerp(new THREE.Color(0xffffff),k).getHex();
@@ -501,7 +504,7 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>TM(M2);
  headG.add(part(sphG,sm,0,.33,0,.5,.47,.48,1.07),part(sphG,sm,-.49,.29,.04,.1,.13,.08),part(sphG,sm,.49,.29,.04,.1,.13,.08),
   part(sphG,em,-.17,.35,-.43,.07,.11,.04,1.35),part(sphG,em,.17,.35,-.43,.07,.11,.04,1.35));
  {const bw=L(shade(HC[lk.hc],.8));mats.push(bw);for(const sx of [-1,1]){const b=new THREE.Mesh(boxU,bw);b.position.set(sx*.18,.5,-.41);b.scale.set(.13,.035,.03);b.rotation.set(-.35,0,-sx*.14);headG.add(b)}
-  const ck=L(0xff9a9a);mats.push(ck);ck.transparent=false;for(const sx of [-1,1]){const c=new THREE.Mesh(sphG,ck);c.position.set(sx*.29,.22,-.38);c.scale.set(.07,.035,.02);headG.add(c)}}
+ }
  for(const sx of [-1,1])body.add(part(sphG,sm,sx*.3,.98,0,.13,.11,.13,1.1));
  // cabelo
  const gold=mm(0xffd34d);
@@ -548,6 +551,19 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>TM(M2);
   case 17:T(.06,0x9aa3ad);S2(0xc0c8d0,-.34,1.0,0,.17,.12,.18,1.08);S2(0xc0c8d0,.34,1.0,0,.17,.12,.18,1.08);R(0x6b4a2f,.62,.37);B(0xe23b3b,0,.86,-.31,.16,.2,.02,0,0,1.15);B(0xffd34d,0,.86,-.325,.04,.16,.02);B(0xffd34d,0,.9,-.325,.12,.04,.02);bot=0x9aa3ad;break;
   case 18:T(.12,c1,null,{nh:1});SK(c1,.66,.12,.58);R(W,.64,.35);S2(W,0,.64,-.36,.06,.05,.04);for(const sx of [-1,1])S2(W,sx*.09,.65,-.35,.07,.045,.03);shorts.visible=false;break;
   case 19:T(.12,W,null,{nh:1});SK(c1,.62,.3,.5);for(const sx of [-1,1])B(c1,sx*.06,1.06,-.26,.1,.05,.04,-.4,sx*.6);bot=c1;break}
+
+ // acessórios (vários ao mesmo tempo)
+ {const A=b=>lk.ac&(1<<b),hd=(g,c,x,y,z,sx,sy,sz,rx=0,ry=0,rz=0,k=0)=>{const o=new THREE.Mesh(g,mm(c));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.rotation.set(rx,ry,rz);if(k)ol(o,om,k);headG.add(o);return o};
+  if(A(0))for(const sx of [-1,1])hd(sphG,0xff8f9f,sx*.29,.22,-.38,.075,.038,.02);
+  if(A(1))for(const sx of [-1,1])for(const [dx,dy] of [[0,0],[.05,.04],[.09,-.01],[.03,-.05]])hd(sphG,0x8a5a2b,sx*(.22+dx),.25+dy,-.43,.014,.014,.01);
+  if(A(2)){for(const sx of [-1,1]){const r=hd(torU,0x2b2f3a,sx*.17,.36,-.47,.11,.13,.12);hd(boxU,0x2b2f3a,sx*.38,.38,-.3,.02,.025,.3,0,sx*.25,0)}hd(boxU,0x2b2f3a,0,.38,-.48,.1,.025,.02)}
+  if(A(3)){for(const sx of [-1,1]){hd(boxU,0x15161a,sx*.17,.36,-.47,.2,.13,.03,0,0,0,1.25);hd(boxU,0x15161a,sx*.38,.38,-.3,.02,.025,.3,0,sx*.25,0)}hd(boxU,0x15161a,0,.39,-.48,.1,.03,.02)}
+  if(A(4)){const o=hd(torU,c1===0xf4f4f4?0xe23b3b:0xf4f4f4,0,.6,.0,.47,.47,.9,PI/2-.12,0,0);}
+  if(A(5)){hd(boxU,0xf2d0a4,.25,.24,-.42,.16,.06,.02,0,-.35,.4,1.15);hd(boxU,0xe0b88a,.25,.24,-.43,.05,.05,.01,0,-.35,.4)}
+  if(A(6)){for(const sx of [-1,1])B(0x1e6bff,sx*.07,.98,-.29,.05,.32,.02,0,sx*.35);const md=S2(0xffd34d,0,.8,-.33,.08,.08,.025,1.15);S2(0xffb000,0,.8,-.345,.045,.045,.01,0)}
+  if(A(7)){R(0xffd34d,.6,.4);B(0xffd34d,0,.6,-.4,.24,.17,.04,0,0,1.12);S2(0xe23b3b,0,.6,-.43,.05,.05,.02,0)}
+  if(A(8))for(const sx of [-1,1])hd(sphG,0xffd34d,sx*.51,.15,.04,.04,.04,.04);
+  if(A(9))for(const sx of [-1,1])for(const dy of [0,.06])hd(boxU,0xe23b3b,sx*.27,.21+dy,-.41,.14,.025,.02,0,sx*-.5,0)}
  p.bm.color.setHex(bot);
  if(shorts.visible){const lum=new THREE.Color(bot).getHSL({}).l,wb=lum>.6?0x2b2f3a:0xf4f4f4;R(wb,.6,.37);for(const sx of [-1,1])B(wb,sx*.385,.42,0,.03,.34,.12,0,sx*-.1)}
  p.mats=mats;p.om=om;Object.assign(p,{rig,body,headG,fL,fR,look:lk});return rig}
@@ -1018,7 +1034,7 @@ function netIn(){const g=net.gr;if(!g)return;let peers=[];try{peers=g.peers()}ca
  const me=P[0],live=new Map(),mine=peers.find(p=>p.sameTab);if(mine&&me.id!==mine.peer){me.id=mine.peer;net.me=mine.peer}
  for(const pe of peers){if(pe.sameTab)continue;const s=pe.presence;if(!s||s.v!==1)continue;live.set(pe.peer,s);
   let e=byId(pe.peer);
-  if(!e){e=mk({id:pe.peer,name:String((pe.by&&names[pe.by])||s.nm||'Jogador').slice(0,16),ci:s.ci|0,kind:'remote',look:Array.isArray(s.lk)?normLook({h:s.lk[0],hc:s.lk[1],sk:s.lk[2],o:s.lk[3],oc:s.lk[4]}):undefined});e.tp=new V3();e.ty=0;e.sp=true;P.push(e);
+  if(!e){e=mk({id:pe.peer,name:String((pe.by&&names[pe.by])||s.nm||'Jogador').slice(0,16),ci:s.ci|0,kind:'remote',look:Array.isArray(s.lk)?normLook({h:s.lk[0],hc:s.lk[1],sk:s.lk[2],o:s.lk[3],oc:s.lk[4],ac:s.lk[5]}):undefined});e.tp=new V3();e.ty=0;e.sp=true;P.push(e);
    net.lastSeq[pe.peer]=maxSeq(s.ev);net.lastDc[pe.peer]=s.dc|0;net.lastCo[pe.peer]=maxSeq(s.co);if(Array.isArray(s.s))e.pos.set(+s.s[0]||0,+s.s[1]||0,+s.s[2]||0);board()}
   if(Array.isArray(s.s)){e.tp.set(+s.s[0]||0,+s.s[1]||0,+s.s[2]||0);e.ty=+s.s[3]||0;e.pitch=+s.s[4]||0}
   e.hp=+s.hp||0;e.sh=+s.sh||0;const dd=!!s.dd;if(dd&&!e.dead)burst(e.pos.clone().setY(e.pos.y+1),e.color,22,7);if(!dd&&e.dead)e.pos.copy(e.tp);e.dead=dd;e.grp.visible=!dd;
@@ -1052,7 +1068,7 @@ function netIn(){const g=net.gr;if(!g)return;let peers=[];try{peers=g.peers()}ca
   if(hs&&Array.isArray(hs.co)){if(net.lastCo[host]==null)net.lastCo[host]=maxSeq(hs.co);
    for(const v of hs.co){if(!Array.isArray(v)||!(+v[0]>net.lastCo[host]))continue;net.lastCo[host]=+v[0];if(v[1]===me.id)givePU(me,v[2]|0)}}}}
 function netOut(dt){net.acc+=dt;if(net.acc<.05||!net.gr)return;net.acc=0;const me=P[0];
- net.gr.presence({v:1,lk:[myLook.h,myLook.hc,myLook.sk,myLook.o,myLook.oc],nm:me.name,ci:me.ci|0,s:[r2(me.pos.x),r2(me.pos.y),r2(me.pos.z),r3(me.yaw),r3(me.pitch)],hp:Math.ceil(Math.max(0,me.hp)),sh:Math.ceil(me.sh),dd:me.dead?1:0,
+ net.gr.presence({v:1,lk:[myLook.h,myLook.hc,myLook.sk,myLook.o,myLook.oc,myLook.ac],nm:me.name,ci:me.ci|0,s:[r2(me.pos.x),r2(me.pos.y),r2(me.pos.z),r3(me.yaw),r3(me.pitch)],hp:Math.ceil(Math.max(0,me.hp)),sh:Math.ceil(me.sh),dd:me.dead?1:0,
   pu:me.pu,pn:me.pn,fl:(me.flurry||me.spinA)?1:0,cb:[me.cbN,me.cbK],ph:me.ph,pS:me.pS,bl:me.bl?1:0,sc:me.score,dc:net.dc,kb:net.kb,ev:net.ev,
   cs:net.host?chests.map(c=>[c.id,c.sp,c.rar,c.hp,c.max]):null,co:net.host?net.co:null,tl:net.host?Math.ceil(Math.max(0,matchT)):null}).catch(()=>{})}
 let p2p=false;
@@ -1181,7 +1197,8 @@ function pvBuild(){if(!pvS)return;if(pvM)pvS.remove(pvM);const p={bm:TM(0xe23b3b
 function pvDraw(dt){if(!pvR)return;pvT+=dt;pvM.rotation.y=Math.sin(pvT*.6)*.9;pvM.position.y=Math.sin(pvT*2.4)*.02;pvR.render(pvS,pvC)}
 function lookUI(){
  document.querySelectorAll('#lktab button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===lkTab));
- ['h','o','c'].forEach(t=>$('#lk'+t).classList.toggle('hide',t!==lkTab));
+ ['h','o','a','c'].forEach(t=>$('#lk'+t).classList.toggle('hide',t!==lkTab));
+ $('#lkag').innerHTML=ACC.map((a,i)=>`<button data-ac="${i}" aria-pressed="${!!(myLook.ac&(1<<i))}">${myLook.ac&(1<<i)?'✓ ':''}${esc(a)}</button>`).join('');
  document.querySelectorAll('#lkf button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===lkF));
  $('#lkhg').innerHTML=HAIRS.map((h,i)=>lkF==='a'||h[1]===lkF||h[1]==='u'?`<button data-h="${i}" aria-pressed="${myLook.h===i}">${esc(h[0])}</button>`:'').join('');
  $('#lkog').innerHTML=OUT.map((o,i)=>`<button data-o="${i}" aria-pressed="${myLook.o===i}">${esc(o[0])}</button>`).join('');
@@ -1190,6 +1207,7 @@ function lookUI(){
 function setLook(k,v){myLook[k]=v;myLook=normLook(myLook);LS.set('luvas_look',myLook);pvBuild();lookUI()}
 $('#look').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.t){lkTab=d.t;lookUI()}else if(d.f){lkF=d.f;lookUI()}
+ else if(d.ac!=null){setLook('ac',myLook.ac^(1<<+d.ac))}
  else for(const k of ['h','o','sk','hc','oc'])if(d[k]!=null){setLook(k,+d[k]);break}});
 $('#lookb').onclick=()=>{$('#look').classList.remove('hide');lookOpen=true;
  if(!pvR){try{pvR=new THREE.WebGLRenderer({canvas:$('#pv'),antialias:true,alpha:true});pvR.setPixelRatio(1);pvS=new THREE.Scene();
