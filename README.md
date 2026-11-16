@@ -50,6 +50,7 @@ No modo **Amigo na mesma tela**, o Jogador 2 usa o controle ou o teclado: I J K 
 - **Lutas por tempo:** 3, 5, 10 ou 15 minutos. Ganha quem tiver mais nocautes.
 - **50 luvas especiais** em 4 raridades (comum, rara, épica e lendária), dentro de baús que precisam de muitos socos para abrir. As mais raras ficam no alto dos morros e no meio dos lagos. As luvas encontradas podem ser escolhidas como luva padrão na Coleção.
 - **Natação:** os lagos são fundos e você precisa nadar.
+- **Personagem personalizável:** 50 penteados (filtro para meninos e meninas), 20 roupas e cores de pele, cabelo e roupa. O visual fica salvo e aparece para os outros jogadores no online.
 - **Minimapa** com adversários e baús.
 
 ### Combos
