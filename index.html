@@ -125,6 +125,19 @@ body.touch #feed{top:60px}body.touch .sts{bottom:auto;top:calc(50% - 60px)}body.
 body.touch #board{max-width:58vw}body.touch #board span{font-size:12px;padding:2px 8px}
 body.touch #mode button[data-v=duo]{display:none}
 .ov{touch-action:auto}
+.mc{width:min(1120px,100%);padding:clamp(16px,2.4vw,26px)}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.mh h1{font-size:clamp(34px,4.5vw,46px);margin:0}.mh .sub{margin:2px 0 0;font-size:15px}
+.mtop{display:flex;gap:8px;flex-wrap:wrap}
+.mg{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:24px;margin-top:6px}
+.lbl{font-weight:800;margin:12px 0 6px}.lbl output{margin-left:4px}
+.side .big{margin:16px 0 4px}.side .acts .big{margin-top:12px}
+#onl{max-height:min(60vh,520px);overflow:auto;padding-right:4px}#onl #onst{margin:10px 0 0}
+.card.wide{width:min(1100px,100%)}
+#help .ctl{align-items:start}.cbx{grid-column:1/-1}.cbx ul{columns:3 250px;column-gap:24px;margin:4px 0 8px;padding-left:18px}.cbx li{break-inside:avoid;margin-bottom:5px}.cbx li span{opacity:.75}
+.maps{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+.maps button small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:820px){.mg{grid-template-columns:minmax(0,1fr);gap:4px}}
 .dead{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:rgba(226,59,59,.3);font:400 clamp(24px,4vw,40px)/1.15 'Lilita One',sans-serif}
 .dead small{display:block;font:800 16px Nunito,sans-serif;margin-top:6px}
 .rmc{position:absolute;left:18px;top:14px;font-weight:800;font-size:14px;background:rgba(16,38,28,.72);border-radius:10px;padding:4px 10px}
@@ -149,31 +162,40 @@ body.touch #mode button[data-v=duo]{display:none}
 </div>
 <div id="rot"><b>Vire o celular</b>O jogo funciona com o celular deitado.</div>
 
-<div id="menu" class="ov"><div class="card">
-  <h1>Upper<span>cut!</span></h1>
-  <p class="sub">Boxe em primeira pessoa num mapa aberto. Abra baús escondidos e colecione as 50 luvas especiais!</p>
-  <div class="row"><label>Modo</label><div class="seg" id="mode"><button data-v="cpu" aria-pressed="true">Contra CPUs</button><button data-v="duo" aria-pressed="false">Amigo na mesma tela</button><button data-v="online" aria-pressed="false">Online com amigos</button></div></div>
-  <div class="row"><label>Mapa</label><div class="maps" id="maps"></div></div>
-  <div id="offrows">
-    <div class="row"><label for="bots">CPUs na arena <output id="bo">4</output></label><input type="range" id="bots" min="1" max="30" value="4"></div>
-    <div class="row"><label>Dificuldade</label><div class="seg" id="diff"><button data-v="facil" aria-pressed="false">Fácil</button><button data-v="normal" aria-pressed="true">Normal</button><button data-v="dificil" aria-pressed="false">Difícil</button></div></div>
-    <div class="row"><label>Duração da luta</label><div class="seg" id="mins"><button data-v="3" aria-pressed="false">3 min</button><button data-v="5" aria-pressed="true">5 min</button><button data-v="10" aria-pressed="false">10 min</button><button data-v="15" aria-pressed="false">15 min</button></div></div>
-    <button id="go" class="big">Lutar!</button>
+<div id="menu" class="ov"><div class="card mc">
+  <div class="mh"><div><h1>Upper<span>cut!</span></h1><p class="sub">Boxe em primeira pessoa num mapa aberto. Abra baús e colecione as 50 luvas especiais!</p></div>
+    <div class="mtop"><button class="btn" id="albb">Coleção de luvas 0/50</button><button class="btn" id="helpb">Controles e combos</button></div></div>
+  <div class="mg">
+    <div>
+      <div class="lbl">Modo</div><div class="seg" id="mode"><button data-v="cpu" aria-pressed="true">Contra CPUs</button><button data-v="duo" aria-pressed="false">Amigo na mesma tela</button><button data-v="online" aria-pressed="false">Online com amigos</button></div>
+      <div class="lbl">Mapa</div><div class="maps" id="maps"></div>
+    </div>
+    <div class="side">
+      <div id="offrows">
+        <div class="lbl"><label for="bots">CPUs na arena </label><output id="bo">4</output></div><input type="range" id="bots" min="1" max="30" value="4">
+        <div class="lbl">Dificuldade</div><div class="seg" id="diff"><button data-v="facil" aria-pressed="false">Fácil</button><button data-v="normal" aria-pressed="true">Normal</button><button data-v="dificil" aria-pressed="false">Difícil</button></div>
+        <div class="lbl">Duração da luta</div><div class="seg" id="mins"><button data-v="3" aria-pressed="false">3 min</button><button data-v="5" aria-pressed="true">5 min</button><button data-v="10" aria-pressed="false">10 min</button><button data-v="15" aria-pressed="false">15 min</button></div>
+        <button id="go" class="big">Lutar!</button>
+      </div>
+      <div id="onl" class="hide">
+        <p id="onst">Conectando ao modo online…</p>
+        <div class="lbl"><label for="nick">Seu apelido</label></div><input type="text" id="nick" maxlength="16" placeholder="Ex.: Rafa">
+        <div class="acts"><button class="big" id="mkroom">Criar sala</button></div>
+        <div class="code" style="margin-top:10px"><input type="text" id="rcode" maxlength="8" placeholder="Código da sala do amigo"><button class="btn pri" id="jroom">Entrar</button></div>
+        <div id="incoming"></div>
+        <h3>Amigos</h3><div class="olist" id="frl"></div>
+        <h3>Pessoas online agora</h3><div class="olist" id="ppl"></div>
+        <p class="note">Para jogar online, compartilhe esta página com seus amigos (botão Compartilhar do Claude). Eles precisam abrir o link conectados à conta Claude. Peça amizade, aceite e convide para a sua sala, ou passe o código da sala.</p>
+      </div>
+      <p class="note" id="padn">Funciona com teclado e mouse, controle de videogame (Xbox/PlayStation) ou na tela do celular.</p>
+    </div>
   </div>
-  <div id="onl" class="hide">
-    <p id="onst">Conectando ao modo online…</p>
-    <div class="row"><label for="nick">Seu apelido</label><input type="text" id="nick" maxlength="16" placeholder="Ex.: Rafa"></div>
-    <div class="acts"><button class="big" id="mkroom">Criar sala</button></div>
-    <div class="code" style="margin-top:10px"><input type="text" id="rcode" maxlength="8" placeholder="Código da sala do amigo"><button class="btn pri" id="jroom">Entrar</button></div>
-    <div id="incoming"></div>
-    <h3>Amigos</h3><div class="olist" id="frl"></div>
-    <h3>Pessoas online agora</h3><div class="olist" id="ppl"></div>
-    <p class="note">Para jogar online, compartilhe esta página com seus amigos (botão Compartilhar do Claude). Eles precisam abrir o link conectados à conta Claude. Peça amizade, aceite e convide para a sua sala, ou passe o código da sala.</p>
-  </div>
-  <div class="acts"><button class="btn" id="albb">Coleção de luvas 0/50</button></div>
-  <h3>Controles</h3>
+</div></div>
+
+<div id="help" class="ov hide"><div class="card wide">
+  <h2>Controles e combos</h2>
   <div id="ctl" class="ctl"></div>
-  <p class="note" id="padn">Funciona com teclado e mouse, controle de videogame (Xbox/PlayStation) ou na tela do celular.</p>
+  <div class="acts"><button class="btn" id="helpx">Fechar</button></div>
 </div></div>
 
 <div id="album" class="ov hide"><div class="card">
@@ -811,7 +833,7 @@ function startMatch(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudio
   for(let i=0;i<cfg.bots;i++)P.push(mk({id:'B'+i,name:PAL[2+i][0],ci:2+i,kind:'bot'}))}
  P.forEach(spawn);for(let i=0;i<CHN;i++)chestTimers.push(i*.15);
  layoutHud();board();running=true;paused=false;inMenu=false;
- ['#menu','#end','#pause','#album'].forEach(s=>$(s).classList.add('hide'));$('#board').classList.remove('hide');
+ ['#menu','#end','#pause','#album','#help'].forEach(s=>$(s).classList.add('hide'));$('#board').classList.remove('hide');
  const me=P[0];if(mode=='online'){me.hud.rmc.classList.remove('hide');me.hud.rmc.textContent='Sala '+net.code+' · passe o código para os amigos'}
  if(document.activeElement)document.activeElement.blur();tryLock()}
 function setPause(v){paused=v;mL=mR=false;$('#pst').textContent=net.on?'No online a luta continua enquanto você está aqui!':'Respire fundo e volte para o ringue.';$('#pause').classList.toggle('hide',!v)}
@@ -973,12 +995,12 @@ const CTL={cpu:`<div><b>Teclado e mouse</b><kbd>W A S D</kbd> andar · <kbd>Mous
  <div><b>Luvas especiais</b>Ache baús e soque até abrir. Os comuns ficam pelo campo; os raros, épicos e lendários estão no alto dos morros e no fundo do lago, e precisam de muitos socos.</div>`,
  duo:`<div><b>Jogador 1 (esquerda)</b><kbd>W A S D</kbd> andar · <kbd>Mouse</kbd> olhar · <kbd>Clique</kbd> soco · <kbd>Botão direito</kbd> soco forte · <kbd>Q</kbd> defender · <kbd>Espaço</kbd> pular</div>
  <div><b>Jogador 2 (direita)</b>Controle: <kbd>RT</kbd> soco, <kbd>RB</kbd> soco forte, <kbd>LT</kbd> defender, <kbd>A</kbd> pular. Teclado: <kbd>I J K L</kbd> andar · <kbd>Setas</kbd> olhar · <kbd>Enter</kbd> soco · <kbd>Shift dir.</kbd> forte · <kbd>P</kbd> defender · <kbd>O</kbd> pular</div>`};
-{const cc=`<div><b>Combos</b>${Object.values(CB).map(c=>`<strong>${c[0]}</strong>: ${c[1]} (${c[2]})`).join('<br>')}<br>Cada golpe seguido sem apanhar aumenta sua força, até +50%.</div>`;CTL.cpu+=cc;CTL.duo+=cc}
+{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.</div>`;CTL.cpu+=cc;CTL.duo+=cc}
 CTL.online=CTL.cpu;
-CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div><b>Combos[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
+CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div class="cbx">[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
 function modeUI(){const m=cfg.mode,duo=m=='duo',r=$('#bots');$('#offrows').classList.toggle('hide',m=='online');$('#onl').classList.toggle('hide',m!='online');
  r.min=duo?0:1;if(duo&&cfg.bots==4)cfg.bots=0;if(!duo&&cfg.bots<1)cfg.bots=4;r.value=cfg.bots;$('#bo').textContent=cfg.bots;
- r.previousElementSibling.firstChild.textContent=duo?'CPUs extras ':'CPUs na arena ';$('#ctl').innerHTML=TOUCH?CTL.touch:CTL[m];if(m=='online'){initOnline();renderOnline()}}
+ document.querySelector('label[for=bots]').textContent=duo?'CPUs extras ':'CPUs na arena ';$('#ctl').innerHTML=TOUCH?CTL.touch:CTL[m];if(m=='online'){initOnline();renderOnline()}}
 seg('mode','mode');seg('diff','diff');seg('mins','mins',true);
 $('#bots').addEventListener('input',e=>{cfg.bots=+e.target.value;$('#bo').textContent=cfg.bots});
 $('#go').onclick=()=>{if(cfg.mode!='online')startMatch()};
@@ -993,6 +1015,7 @@ function drawAlbum(){$('#albs').textContent=`Você já encontrou ${album.length}
 $('#albg').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;eq=+b.dataset.k;LS.set('luvas_eq',eq);drawAlbum();albBtn()});
 $('#albb').onclick=()=>{drawAlbum();$('#album').classList.remove('hide')};
 $('#albx').onclick=()=>$('#album').classList.add('hide');
+$('#helpb').onclick=()=>$('#help').classList.remove('hide');$('#helpx').onclick=()=>$('#help').classList.add('hide');
 albBtn();modeUI();
 function drawMini(p){const c=p.hud.mini;if(!c)return;const g=c.getContext('2d');if(!g)return;const W=128,k=W/(2*L),X=x=>(x+L)*k,Y=z=>(z+L)*k;
  if(miniBg)g.drawImage(miniBg,0,0);else{g.fillStyle='#4f9a3f';g.fillRect(0,0,W,W)}
