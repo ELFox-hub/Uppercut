@@ -485,7 +485,11 @@ function numTex(){if(texCache.n)return texCache.n;const cv=document.createElemen
 function randLook(n){let s=(n*9301+49297)%233280||7;const r=()=>(s=s*16807%2147483647)/2147483647;
  return{h:Math.floor(r()*HAIRS.length),hc:Math.floor(r()*8),sk:Math.floor(r()*SKIN.length),o:Math.floor(r()*OUT.length),oc:Math.floor(r()*OC.length)}}
 function normLook(l){const n=(v,m,d)=>Number.isInteger(+v)&&+v>=0&&+v<m?+v:d;l=l||{};return{h:n(l.h,HAIRS.length,3),hc:n(l.hc,HC.length,0),sk:n(l.sk,SKIN.length,2),o:n(l.o,OUT.length,0),oc:n(l.oc,OC.length,0)}}
-function boxer(p,lk){lk=normLook(lk);const L=M2=>new THREE.MeshLambertMaterial({color:M2});
+const toonGrad=(()=>{const t=new THREE.DataTexture(new Uint8Array([110,190,255]),3,1,THREE.LuminanceFormat);t.minFilter=t.magFilter=THREE.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;return t})();
+const TM=(c,o)=>new THREE.MeshToonMaterial(Object.assign({color:c,gradientMap:toonGrad},o||{}));
+const shade=(c,k)=>new THREE.Color(c).multiplyScalar(k).getHex(),tint=(c,k)=>new THREE.Color(c).lerp(new THREE.Color(0xffffff),k).getHex();
+const NOFRINGE=new Set([0,1,2,5,6,7,9,10,11,12,13,14,17,20,23,24,36,42,43,45]);
+function boxer(p,lk){lk=normLook(lk);const L=M2=>TM(M2);
  const sm=L(SKIN[lk.sk]),hm=L(HC[lk.hc]),am=L(0xff4f9a),em=new THREE.MeshBasicMaterial({color:0xffffff}),km=L(0x3a3a3a),
   om=new THREE.MeshBasicMaterial({color:0x111111,side:THREE.BackSide}),c1=OC[lk.oc],mats=[sm,hm,am,em,km,om,p.bm];
  const mm=c=>{const m=L(c);mats.push(m);return m};
@@ -496,6 +500,9 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>new THREE.MeshLambertMaterial({
  body.add(fL,fR,shorts,part(sphG,sm,0,.84,0,.36,.36,.3),headG);
  headG.add(part(sphG,sm,0,.33,0,.5,.47,.48,1.07),part(sphG,sm,-.49,.29,.04,.1,.13,.08),part(sphG,sm,.49,.29,.04,.1,.13,.08),
   part(sphG,em,-.17,.35,-.43,.07,.11,.04,1.35),part(sphG,em,.17,.35,-.43,.07,.11,.04,1.35));
+ {const bw=L(shade(HC[lk.hc],.8));mats.push(bw);for(const sx of [-1,1]){const b=new THREE.Mesh(boxU,bw);b.position.set(sx*.18,.5,-.41);b.scale.set(.13,.035,.03);b.rotation.set(-.35,0,-sx*.14);headG.add(b)}
+  const ck=L(0xff9a9a);mats.push(ck);ck.transparent=false;for(const sx of [-1,1]){const c=new THREE.Mesh(sphG,ck);c.position.set(sx*.29,.22,-.38);c.scale.set(.07,.035,.02);headG.add(c)}}
+ for(const sx of [-1,1])body.add(part(sphG,sm,sx*.3,.98,0,.13,.11,.13,1.1));
  // cabelo
  const gold=mm(0xffd34d);
  for(const q of HAIRS[lk.h][2]){let t=q[0],mat=hm;if(t[0]=='A'){t=t.slice(1);mat=t=='c'?gold:am}let m;
@@ -506,8 +513,15 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>new THREE.MeshLambertMaterial({
   else if(t=='b'){m=new THREE.Mesh(boxU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[5],q[6]);m.rotation.x=q[7]||0}
   else if(t=='t'){m=new THREE.Mesh(q[0]=='At'?arcU:torU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[4],q[4]*1.6);m.rotation.x=q[5]}
   if(m)headG.add(m)}
+ {const parts=HAIRS[lk.h][2],cap=parts.find(q=>q[0]=='cap'),hi=L(tint(HC[lk.hc],.45));mats.push(hi);
+  if(cap||lk.h===10||lk.h===42){const [x,y,z]=cap?hsP(.42,PI*1.18,1.06):[-.2,.92,-.05];const h=new THREE.Mesh(sphG,hi);h.position.set(x,y,z);h.scale.set(.15,.035,.08);h.rotation.set(-.5,-.35,.3);headG.add(h)}
+  if(cap&&cap[1]>=.55&&!NOFRINGE.has(lk.h)){for(let k=-2;k<=2;k++){const [x,y,z]=hsP(1.12+Math.abs(k)*.06,PI+k*.36,1.03);const t=new THREE.Mesh(sphG,hm);t.position.set(x,y,z);t.scale.set(.12,.1,.07);t.rotation.set(-.6,k*.36,0);ol(t,om,1.12);headG.add(t)}
+   for(const sx of [-1,1]){const [x,y,z]=hsP(1.42,PI+sx*1.25,1.02);const t=new THREE.Mesh(sphG,hm);t.position.set(x,y,z);t.scale.set(.07,.13,.07);ol(t,om,1.12);headG.add(t)}}}
  // roupa
- const T=(t,c,map)=>{const m=map?new THREE.MeshLambertMaterial({color:0xffffff,map}):mm(c);if(map)mats.push(m);const o=new THREE.Mesh(shirtG(t),m);o.position.set(0,.84,0);o.scale.set(.375,.375,.315);ol(o,om,1.07);body.add(o);return o};
+ const T=(t,c,map,opt={})=>{const m=map?TM(0xffffff,{map}):mm(c);if(map)mats.push(m);const o=new THREE.Mesh(shirtG(t),m);o.position.set(0,.84,0);o.scale.set(.375,.375,.315);ol(o,om,1.07);body.add(o);
+  const base=map?(opt.sc||c):c;
+  if(t<=.12&&!opt.ns){for(const sx of [-1,1]){const sl=part(sphG,m,sx*.31,.98,0,.15,.13,.15,1.08);body.add(sl);const cf=new THREE.Mesh(torU,mm(shade(base,.75)));cf.position.set(sx*.36,.9,0);cf.scale.set(.1,.1,.12);cf.rotation.set(0,0,PI/2+sx*.5);body.add(cf)}}
+  if(!opt.nc&&t<=.12)R(shade(base,.75),1.13,.17);if(!opt.nh)R(shade(base,.8),.58,.345);return o};
  const B=(c,x,y,z,sx,sy,sz,rx=0,rz=0,k=0)=>{const o=part(boxU,mm(c),x,y,z,sx,sy,sz,k);o.rotation.set(rx,0,rz);body.add(o);return o};
  const S2=(c,x,y,z,sx,sy,sz,k)=>{const o=part(sphG,mm(c),x,y,z,sx,sy??sx,sz??sx,k);body.add(o);return o};
  const R=(c,y,r,rz=0,z=0)=>{const o=new THREE.Mesh(torU,mm(c));o.position.set(0,y,z);o.scale.set(r,r,r*1.4);o.rotation.set(PI/2,0,rz);body.add(o);return o};
@@ -515,26 +529,27 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>new THREE.MeshLambertMaterial({
  const W=0xf4f4f4,K=0x2b2f3a;let bot=c1;
  switch(lk.o){
   case 0:break;
-  case 1:T(.3,c1);bot=K;break;
+  case 1:T(.3,c1);R(shade(c1,.75),1.06,.26,0,0);bot=K;break;
   case 2:T(.12,c1);bot=0x2f5fb0;break;
   case 3:T(.12,0,stripeTex(c1,W));bot=K;break;
-  case 4:T(.04,c1);S2(c1,0,1.13,.26,.3,.2,.16,1.08);B(new THREE.Color(c1).multiplyScalar(.8).getHex(),0,.7,-.29,.32,.12,.05);bot=K;break;
-  case 5:{const r=S2(c1,0,.86,0,.42,.42,.36,1.06);SK(c1,.7,.2,.46);R(0xffd34d,.66,.39);R(0xffd34d,1.13,.2);shorts.visible=false;break}
-  case 6:T(.06,c1);B(0xd0d0d0,0,.86,-.31,.03,.52,.03);R(K,1.14,.2);bot=0x2f5fb0;break;
-  case 7:T(.12,W);B(c1,0,.78,-.27,.36,.32,.08);B(c1,-.15,.98,-.2,.06,.3,.06,.5);B(c1,.15,.98,-.2,.06,.3,.06,.5);bot=c1;break;
-  case 8:{T(.12,c1);const n=new THREE.Mesh(boxU,new THREE.MeshBasicMaterial({map:numTex(),transparent:true}));mats.push(n.material);n.position.set(0,.88,.33);n.scale.set(.26,.26,.01);body.add(n);bot=W;break}
+  case 4:T(.04,c1,null,{nc:1});S2(c1,0,1.12,.24,.34,.24,.2,1.08);B(shade(c1,.8),0,.7,-.29,.34,.14,.05,0,0,1.1);for(const sx of [-1,1]){const d=part(cylU,mm(W),sx*.07,1.0,-.3,.015,.18,.015,0);body.add(d)}bot=K;break;
+  case 5:{S2(c1,0,.86,0,.42,.42,.36,1.06);SK(c1,.7,.2,.46);R(0xffd34d,.66,.4);R(0xffd34d,1.13,.2);for(const sx of [-1,1])B(0xffd34d,sx*.1,.95,-.33,.06,.42,.03,0,sx*.42);for(const sx of [-1,1])S2(c1,sx*.32,1.0,0,.17,.14,.17,1.08);S2(0xffd34d,0,.66,-.39,.06,.06,.04);shorts.visible=false;break}
+  case 6:T(.06,c1);B(0xd0d0d0,0,.86,-.315,.03,.52,.03);for(const sx of [-1,1])B(shade(c1,.7),sx*.08,1.06,-.24,.12,.16,.05,-.5,sx*.5);B(0xd0d0d0,-.18,.78,-.3,.1,.03,.02);bot=0x2f5fb0;break;
+  case 7:T(.12,W);B(c1,0,.76,-.28,.38,.34,.08,0,0,1.1);B(shade(c1,.7),0,.8,-.33,.14,.1,.02);S2(0xffd34d,-.13,.9,-.32,.03);S2(0xffd34d,.13,.9,-.32,.03);B(c1,-.15,.98,-.2,.06,.3,.06,.5);B(c1,.15,.98,-.2,.06,.3,.06,.5);bot=c1;break;
+  case 8:{T(.12,c1);for(const sx of [-1,1])B(W,sx*.06,1.06,-.26,.12,.04,.04,-.4,sx*.6);B(W,0,.84,-.315,.02,.4,.02);const n=new THREE.Mesh(boxU,new THREE.MeshBasicMaterial({map:numTex(),transparent:true}));mats.push(n.material);n.position.set(0,.88,.33);n.scale.set(.26,.26,.01);body.add(n);bot=W;break}
   case 9:T(.04,W);B(W,-.1,.95,-.29,.05,.36,.03,0,-.45);B(W,.1,.95,-.29,.05,.36,.03,0,.45);R(K,.64,.37);bot=W;break;
-  case 10:{T(.08,c1);const cape=B(0xe23b3b===c1?0x1e6bff:0xe23b3b,0,.72,.36,.62,.9,.03,.12,0,1.05);S2(0xffd34d,0,.9,-.31,.08,.08,.03,0);R(0xffd34d,.64,.37);bot=c1;break}
+  case 10:{T(.08,c1);const cc=0xe23b3b===c1?0x1e6bff:0xe23b3b;B(cc,0,.68,.38,.7,1.0,.03,.14,0,1.05);for(const sx of [-1,1])S2(cc,sx*.24,1.08,.2,.1,.08,.1);S2(0xffd34d,0,.9,-.31,.11,.11,.03,1.15);S2(cc,0,.9,-.335,.06,.06,.02,0);R(0xffd34d,.62,.37);bot=c1;break}
   case 11:T(.04,K);bot=K;{const m=new THREE.Mesh(boxU,mm(K));m.position.set(0,.13,-.33);m.scale.set(.8,.15,.3);headG.add(m);const bd=new THREE.Mesh(torU,mm(c1));bd.position.set(0,.58,.02);bd.scale.set(.52,.52,.75);bd.rotation.x=PI/2;headG.add(bd)}break;
-  case 12:T(.04,W);B(0xbfc6cf,0,.86,.36,.46,.52,.22,0,0,1.06);B(c1,-.08,.9,-.31,.1,.08,.03);B(0xffd34d,.08,.9,-.31,.1,.08,.03);bot=W;break;
-  case 13:T(.12,W);B(c1,-.2,.82,-.27,.14,.5,.06);B(c1,.2,.82,-.27,.14,.5,.06);R(0xe23b3b,.66,.37);bot=K;{const bn=new THREE.Mesh(capG(.38),mm(0xe23b3b));bn.scale.setScalar(.54);bn.position.set(0,.36,.02);bn.rotation.x=-.25;headG.add(bn)}break;
-  case 14:T(.12,0,stripeTex(c1,0x7a2a2a));B(0x7a4a2a,-.2,.82,-.27,.13,.48,.06);B(0x7a4a2a,.2,.82,-.27,.13,.48,.06);R(0xe23b3b,1.12,.2);bot=0x2f5fb0;break;
-  case 15:T(.12,W);B(W,0,.62,-.3,.42,.62,.03,.15);bot=K;{const h=new THREE.Mesh(cylU,mm(W));h.position.set(0,.98,0);h.scale.set(.3,.32,.3);ol(h,om,1.06);headG.add(h);const pf=new THREE.Mesh(sphG,mm(W));pf.position.set(0,1.18,0);pf.scale.set(.38,.18,.38);ol(pf,om,1.06);headG.add(pf)}break;
-  case 16:T(.04,K);R(c1,.9,.38);R(c1,.62,.37);bot=K;break;
-  case 17:T(.06,0x9aa3ad);S2(0xc0c8d0,-.34,1.0,0,.17,.12,.18,1.08);S2(0xc0c8d0,.34,1.0,0,.17,.12,.18,1.08);R(0x6b4a2f,.62,.37);B(0xffd34d,0,.86,-.31,.12,.12,.02);bot=0x9aa3ad;break;
-  case 18:T(.12,c1);SK(c1,.66,.12,.58);shorts.visible=false;break;
-  case 19:T(.12,W);SK(c1,.62,.3,.5);bot=c1;break}
+  case 12:T(.04,W);B(0xbfc6cf,0,.86,.36,.46,.52,.22,0,0,1.06);R(0xbfc6cf,1.13,.22);B(0x2b2f3a,0,.8,-.31,.2,.14,.02);B(c1,-.08,.9,-.31,.1,.08,.03);B(0xffd34d,.08,.9,-.31,.1,.08,.03);bot=W;break;
+  case 13:T(.12,W);B(c1,-.2,.82,-.27,.14,.5,.06,0,0,1.1);B(c1,.2,.82,-.27,.14,.5,.06,0,0,1.1);S2(0xffd34d,-.12,.88,-.32,.025);S2(0xffd34d,-.12,.76,-.32,.025);R(0xe23b3b,.66,.37);bot=K;{const bn=new THREE.Mesh(capG(.38),mm(0xe23b3b));bn.scale.setScalar(.54);bn.position.set(0,.36,.02);bn.rotation.x=-.25;headG.add(bn)}break;
+  case 14:T(.12,0,stripeTex(c1,0x7a2a2a),{sc:c1});S2(0xffd34d,-.17,.92,-.32,.05,.05,.02,1.15);B(0x7a4a2a,-.2,.82,-.27,.13,.48,.06);B(0x7a4a2a,.2,.82,-.27,.13,.48,.06);R(0xe23b3b,1.12,.2);bot=0x2f5fb0;break;
+  case 15:T(.12,W);B(W,0,.62,-.3,.42,.62,.03,.15,0,1.06);for(const y of [.98,.86,.74])for(const sx of [-1,1])S2(K,sx*.08,y,-.32,.025);bot=K;{const h=new THREE.Mesh(cylU,mm(W));h.position.set(0,.98,0);h.scale.set(.3,.32,.3);ol(h,om,1.06);headG.add(h);const pf=new THREE.Mesh(sphG,mm(W));pf.position.set(0,1.18,0);pf.scale.set(.38,.18,.38);ol(pf,om,1.06);headG.add(pf)}break;
+  case 16:T(.04,K);R(c1,.9,.38);R(c1,.62,.37);B(0xd0d0d0,0,.95,-.31,.025,.22,.02);bot=K;break;
+  case 17:T(.06,0x9aa3ad);S2(0xc0c8d0,-.34,1.0,0,.17,.12,.18,1.08);S2(0xc0c8d0,.34,1.0,0,.17,.12,.18,1.08);R(0x6b4a2f,.62,.37);B(0xe23b3b,0,.86,-.31,.16,.2,.02,0,0,1.15);B(0xffd34d,0,.86,-.325,.04,.16,.02);B(0xffd34d,0,.9,-.325,.12,.04,.02);bot=0x9aa3ad;break;
+  case 18:T(.12,c1,null,{nh:1});SK(c1,.66,.12,.58);R(W,.64,.35);S2(W,0,.64,-.36,.06,.05,.04);for(const sx of [-1,1])S2(W,sx*.09,.65,-.35,.07,.045,.03);shorts.visible=false;break;
+  case 19:T(.12,W,null,{nh:1});SK(c1,.62,.3,.5);for(const sx of [-1,1])B(c1,sx*.06,1.06,-.26,.1,.05,.04,-.4,sx*.6);bot=c1;break}
  p.bm.color.setHex(bot);
+ if(shorts.visible){const lum=new THREE.Color(bot).getHSL({}).l,wb=lum>.6?0x2b2f3a:0xf4f4f4;R(wb,.6,.37);for(const sx of [-1,1])B(wb,sx*.385,.42,0,.03,.34,.12,0,sx*-.1)}
  p.mats=mats;p.om=om;Object.assign(p,{rig,body,headG,fL,fR,look:lk});return rig}
 function tag(name,c){const k=document.createElement('canvas');k.width=256;k.height=64;const g=k.getContext('2d');
  g.fillStyle='rgba(16,38,28,.6)';g.fillRect(28,6,200,52);g.font='800 34px Nunito,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText(name,128,44);
@@ -543,7 +558,7 @@ function tag(name,c){const k=document.createElement('canvas');k.width=256;k.heig
 const fw=p=>[-Math.sin(p.yaw),-Math.cos(p.yaw)];
 const byId=id=>P.find(e=>e.id===id);
 function mk(o){const color=PAL[((o.ci|0)%PAL.length+PAL.length)%PAL.length][1];
- const grp=new THREE.Group(),bm=new THREE.MeshLambertMaterial({color}),gm=new THREE.MeshLambertMaterial({color:0xe23b3b}),tmp={bm},ck=((o.ci|0)%8+8)%8;
+ const grp=new THREE.Group(),bm=TM(color),gm=TM(0xe23b3b),tmp={bm},ck=((o.ci|0)%8+8)%8;
  const body=boxer(tmp,o.look||randLook((o.ci|0)+1));
  const gL=gloveMesh(gm,-1,tmp.om),gR=gloveMesh(gm,1,tmp.om),t=tag(o.name,color);t.position.y=2.35;
  tmp.body.add(gL,gR);grp.add(body,t);S.add(grp);
@@ -1161,7 +1176,7 @@ $('#helpb').onclick=()=>$('#help').classList.remove('hide');$('#helpx').onclick=
 albBtn();modeUI();
 /* ---------- personagem ---------- */
 let myLook=normLook(LS.get('luvas_look',null)||randLook(7)),lookOpen=false,lkTab='h',lkF='a',pvR=null,pvS=null,pvC=null,pvM=null,pvT=0;
-function pvBuild(){if(!pvS)return;if(pvM)pvS.remove(pvM);const p={bm:new THREE.MeshLambertMaterial({color:0xe23b3b})},rig=boxer(p,myLook),gm=new THREE.MeshLambertMaterial({color:0xe23b3b});
+function pvBuild(){if(!pvS)return;if(pvM)pvS.remove(pvM);const p={bm:TM(0xe23b3b)},rig=boxer(p,myLook),gm=TM(0xe23b3b);
  const gL=gloveMesh(gm,-1,p.om),gR=gloveMesh(gm,1,p.om);gL.position.set(-.55,.72,-.22);gR.position.set(.55,.72,-.22);p.body.add(gL,gR);pvM=new THREE.Group();pvM.add(rig);pvS.add(pvM)}
 function pvDraw(dt){if(!pvR)return;pvT+=dt;pvM.rotation.y=Math.sin(pvT*.6)*.9;pvM.position.y=Math.sin(pvT*2.4)*.02;pvR.render(pvS,pvC)}
 function lookUI(){
