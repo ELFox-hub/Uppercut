@@ -50,7 +50,7 @@ No modo **Amigo na mesma tela**, o Jogador 2 usa o controle ou o teclado: I J K 
 - **Lutas por tempo:** 3, 5, 10 ou 15 minutos. Ganha quem tiver mais nocautes.
 - **100 luvas especiais** em 4 raridades (comum, rara, épica e lendária). Nos baús espalhados pelo mapa você usa a luva durante a luta; para usar sempre, compre na **Loja de luvas** com moedas (cada nocaute vale 1 moeda; comum 10, rara 20, épica 50, lendária 100) e escolha **Usar**. Cada luva tem visual próprio: estampas, fogo, gelo, raios, asas, espinhos, coroa e brilho nas lendárias.
 - 🤖 **Cada CPU usa uma luva diferente** conforme a dificuldade: Fácil = luvas Comuns, Normal = Raras, Difícil = Épicas e Lendárias
-- 👑 **Luva Suprema**: prêmio por ter todas as 100 luvas — toda branca, com 3 coroas brancas de joias azuis flutuando em volta
+- 👑 **Luva Suprema**: prêmio por ter todas as 100 luvas — toda branca, com 3 coroas brancas de joias azuis flutuando em volta. Ao equipar, você ganha a **Coroa Suprema** flutuante e o **Traje Supremo** branco e azul pro seu lutador
 - **Luva Suprema:** uma luva mítica de prêmio, que você ganha quando tiver todas as outras 100.
 - **Kits médicos** espalhados pelo mapa devolvem 40 de vida e voltam depois de 20 segundos.
 - **Natação:** os lagos são fundos e você precisa nadar.
