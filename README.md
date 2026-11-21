@@ -48,7 +48,7 @@ No modo **Amigo na mesma tela**, o Jogador 2 usa o controle ou o teclado: I J K 
 - **3 modos:** contra CPUs (até 30), amigo na mesma tela (tela dividida) e online com amigos por código de sala.
 - **11 mapas:** Ilha Verde (pequena) e 10 mapas gigantes: Floresta Gigante, Deserto Dourado, Montanhas Nevadas, Arquipélago Tropical, Vale do Vulcão, Campo de Flores, Cânion Vermelho, Floresta de Outono, Pântano dos Cogumelos e Terra dos Doces.
 - **Lutas por tempo:** 3, 5, 10 ou 15 minutos. Ganha quem tiver mais nocautes.
-- **50 luvas especiais** em 4 raridades (comum, rara, épica e lendária), dentro de baús que precisam de muitos socos para abrir. As mais raras ficam no alto dos morros e no meio dos lagos. As luvas encontradas podem ser escolhidas como luva padrão na Coleção.
+- **100 luvas especiais** em 4 raridades (comum, rara, épica e lendária). Nos baús espalhados pelo mapa você usa a luva durante a luta; para usar sempre, compre na **Loja de luvas** com os seus nocautes (comum 10, rara 20, épica 50, lendária 100) e escolha **Usar**.
 - **Natação:** os lagos são fundos e você precisa nadar.
 - **Personagem personalizável:** 50 penteados (filtro para meninos e meninas), 20 roupas, 10 acessórios (bochechas rosadas, sardas, óculos, medalha, cinturão e outros) e cores de pele, cabelo e roupa. O visual fica salvo e aparece para os outros jogadores no online.
 - **Minimapa** com adversários e baús.

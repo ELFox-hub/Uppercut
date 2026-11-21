@@ -53,6 +53,10 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 .alb div i{display:block;width:26px;height:26px;border-radius:50% 50% 45% 45%;margin-bottom:4px;border:2px solid rgba(0,0,0,.15)}
 .alb div small{display:block;font-weight:600;opacity:.75}
 .alb .no{opacity:.45}
+.alb div{display:flex;flex-direction:column;gap:2px}.alb div .btn{margin-top:auto;min-height:34px;padding:4px 8px;font-size:13px;white-space:nowrap}.alb div em{margin-top:auto;align-self:flex-start}
+.alb div.lock{background:#fff}.alb div.eq{border-color:var(--blue);background:#e3edff}.alb .btn[disabled]{opacity:.45;cursor:not-allowed}
+.kos{font:400 24px 'Lilita One',sans-serif;background:var(--gold);color:var(--ink);border-radius:14px;padding:6px 14px;white-space:nowrap}
+#albf{margin:4px 0 0}
 .alb button{all:unset;box-sizing:border-box;cursor:pointer;border-radius:12px;padding:8px;font-size:13px;font-weight:800;border:2px solid var(--line);background:var(--soft);min-height:74px;color:var(--ink)}
 .alb button i{display:block;width:26px;height:26px;border-radius:50% 50% 45% 45%;margin-bottom:4px;border:2px solid rgba(0,0,0,.15)}
 .alb button small{display:block;font-weight:600;opacity:.75}
@@ -223,8 +227,9 @@ body.touch #mode button[data-v=duo]{display:none}
   <div class="acts"><button class="btn" id="helpx">Fechar</button></div>
 </div></div>
 
-<div id="album" class="ov hide"><div class="card">
-  <h2>Coleção de luvas</h2><p class="sub" id="albs"></p>
+<div id="album" class="ov hide"><div class="card wide">
+  <div class="mh"><h2>Loja de luvas</h2><div class="kos" id="kosv"></div></div><p class="sub" id="albs"></p>
+  <div class="seg sm" id="albf"><button data-f="all" aria-pressed="true">Todas</button><button data-f="0" aria-pressed="false">Comuns · 10</button><button data-f="1" aria-pressed="false">Raras · 20</button><button data-f="2" aria-pressed="false">Épicas · 50</button><button data-f="3" aria-pressed="false">Lendárias · 100</button><button data-f="own" aria-pressed="false">Minhas</button></div>
   <div class="alb" id="albg"></div>
   <div class="acts"><button class="btn" id="albx">Fechar</button></div>
 </div></div>
@@ -360,7 +365,21 @@ const PU=[
 ['Luva Ninja',2,0x1b1b2f,{inv:1,dash:1,crit:.25}],['Luva Dragão',2,0xd62828,{burn:1,wave:1,d:1.2}],['Luva Sombra',2,0x3a2d5c,{inv:1,life:.35}],['Luva Dínamo',2,0x00e0ff,{chain:1,multi:1}],
 ['Luva Arco-íris',2,0xff66cc,{burn:1,frz:1,crit:.3}],
 ['Luva do Leão',3,0xffb000,{d:1.6,k:1.5,s:1.15}],['Luva Vulcão',3,0xff2a00,{wave:1,burn:1,d:1.3,rkt:1}],['Luva de Zeus',3,0xfff27a,{chain:1,stun:.4,rkt:1,s:1.15}],
-['Luva Galáxia',3,0x6a00ff,{gi:1,rkt:1,wave:1,multi:1}],['Luva Campeã',3,0xffd700,{d:1.5,s:1.3,c:.7,df:.7,reg:3,crit:.2,sh:40}]];
+['Luva Galáxia',3,0x6a00ff,{gi:1,rkt:1,wave:1,multi:1}],['Luva Campeã',3,0xffd700,{d:1.5,s:1.3,c:.7,df:.7,reg:3,crit:.2,sh:40}],
+['Luva de Algodão',0,0xf7f3ea,{c:.75,d:.9}],['Luva de Pedra',0,0x8c8c84,{df:.7,d:1.15,s:.85}],['Luva Saltitante',0,0x9be37a,{j:1.5,s:1.15}],['Luva Chiclete',0,0xff8fd1,{r:1.6,mag:1}],
+['Luva Pimenta',0,0xd62828,{burn:1,c:.9}],['Luva Picolé',0,0x8fe3ff,{frz:1,d:.9,c:.85}],['Luva Trevo',0,0x2ecc71,{crit:.2,s:1.1}],['Luva Bigorna',0,0x4a4f57,{k:2,d:1.25,s:.9}],
+['Luva Esquilo',0,0xb5733a,{mi:1,j:1.4,c:.8}],['Luva Coruja',0,0x9a7b5a,{r:1.4,crit:.15}],['Luva Morcego',0,0x3a2d4a,{life:.2,s:1.1}],['Luva Sapo',0,0x5cbf4a,{j:1.9,dj:1,k:1.2}],
+['Luva Cacto',0,0x3f8a3f,{refl:.3,df:.85}],['Luva Laranja',0,0xff9a1a,{reg:3,s:1.1}],['Luva Vento',0,0xd6f0ff,{s:1.35,dash:1}],['Luva Pipoca',0,0xfff1b8,{multi:1,d:.75}],
+['Luva Escorpião',0,0xb5482a,{poi:1,crit:.15}],['Luva Panda',0,0xf4f4f4,{sh:40,k:1.3}],['Luva Torrada',0,0xc98a3a,{burn:1,d:1.1,c:1.1}],['Luva Neve',0,0xe8f6ff,{frz:1,df:.85}],
+['Luva Pinguim',1,0x2b3a55,{frz:1,dash:1,s:1.15}],['Luva Raio de Sol',1,0xffd84f,{burn:1,crit:.25}],['Luva Hipopótamo',1,0x9a8fb5,{gi:1,df:.8}],['Luva Cobra',1,0x6fbf3a,{poi:1,dash:1,c:.85}],
+['Luva Elétrica',1,0x3dd6ff,{chain:1,s:1.15}],['Luva Casco de Tartaruga',1,0x4f8a3a,{sh:70,crit:.2}],['Luva Bumerangue Duplo',1,0xe8a23a,{rkt:1,multi:1}],['Luva Gorila',1,0x3a3a3a,{d:1.45,k:1.8}],
+['Luva Lula',1,0xd98ab5,{mag:1,poi:1,r:1.4}],['Luva Sereia',1,0x2fc9b5,{reg:5,frz:1}],['Luva Tornado',1,0xa8c8d8,{wave:1,dash:1}],['Luva Vulcânica',1,0xff5a00,{burn:1,wave:1}],
+['Luva Coelho',1,0xffe0f0,{j:2.2,dj:1,s:1.25}],['Luva Espinho',1,0x6b8a2a,{refl:.6,poi:1}],['Luva Lobo',1,0x7a8590,{life:.3,s:1.2,crit:.15}],
+['Luva Fênix Azul',2,0x2f7bff,{reg:6,frz:1,rkt:1}],['Luva Mamute',2,0x8a6a4a,{gi:1,k:2.2,frz:1}],['Luva Relâmpago Negro',2,0x1a1a2a,{chain:1,stun:.3,dash:1}],['Luva Cristal Mágico',2,0xc7f0ff,{refl:.8,sh:60}],
+['Luva Tubarão Branco',2,0xb8c8d0,{life:.3,dash:1,d:1.25}],['Luva Nuvem',2,0xffffff,{inv:1,j:2,dj:1}],['Luva Planeta',2,0x6a5acd,{mag:1,wave:1,gi:1}],['Luva Samurai',2,0xb5182a,{crit:.4,c:.75}],
+['Luva Aurora',2,0x7affc8,{frz:1,burn:1,reg:4}],['Luva Meteoro de Fogo',2,0xff3a1a,{rkt:1,wave:1,burn:1}],
+['Luva do Dragão Dourado',3,0xffc000,{d:1.5,burn:1,wave:1,rkt:1,df:.8}],['Luva do Rei Leão',3,0xe8a000,{d:1.7,k:1.6,s:1.2,sh:50}],['Luva Cósmica',3,0x2a0a5a,{chain:1,multi:1,rkt:1,inv:1}],
+['Luva do Trovão Eterno',3,0xfff27a,{chain:1,stun:.5,s:1.25,crit:.25}],['Luva Arco-íris Lendária',3,0xff66cc,{burn:1,frz:1,poi:1,life:.3,reg:4,crit:.3}]];
 function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  if(m.d>1)o.push('+'+pc(m.d)+' de força');if(m.d<1)o.push('-'+pc(m.d)+' de força');if(m.s>1)o.push('corre mais');if(m.s<1)o.push('anda mais devagar');
  if(m.c<1)o.push('socos mais rápidos');if(m.c>1)o.push('socos mais lentos');if(m.k>1)o.push('empurrão forte');if(m.r>1)o.push('braço comprido');
@@ -373,7 +392,9 @@ function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  return o.join(' · ')}
 let album=LS.get('luvas_album',[]);if(!Array.isArray(album))album=[];
 let eq=LS.get('luvas_eq',-1);if(!(eq>=0&&album.includes(eq)))eq=-1;
-const albBtn=()=>$('#albb').textContent=`Coleção de luvas ${album.length}/50`+(eq>=0?` · padrão: ${PU[eq][0]}`:'');
+const PRICE=[10,20,50,100];let kos=+LS.get('luvas_kos',0)||0,matchKos=0;
+const albBtn=()=>$('#albb').textContent=`Loja de luvas · ${kos} nocautes`;
+function addKo(){kos++;matchKos++;LS.set('luvas_kos',kos);albBtn()}
 function defGlove(p){if(p.human&&p.pu<0&&eq>=0&&album.includes(eq)){p.pu=eq;p.puT=Infinity}}
 const hudPU2=p=>{if(p.hud)hudPU(p)};
 
@@ -411,22 +432,23 @@ const SKIN=[0xf5d0b0,0xf0bb92,0xe0a77a,0xd99a6c,0xc68a5e,0xa86f48,0x8d5a3b,0x6b4
 const HC=[0x2b2b2b,0x111111,0x5a3a22,0x8a5a2b,0xc98a3a,0xe8c070,0xf6e2a8,0xb5482a,0x9a9a9a,0xf4f4f4,0xff7ab8,0x4fa3ff,0x6fd36f,0xa45cff];
 const OC=[0xe23b3b,0x1e6bff,0x2ecc71,0xffb400,0xa45cff,0xff7a1a,0x15c4c9,0xf05bd0,0x2b2f3a,0xf4f4f4,0x8a5a2b,0xffe14d];
 const sphG=new THREE.SphereGeometry(1,16,12),shG=new THREE.CylinderGeometry(.36,.4,.38,14);
-const capGs={},capG=t=>capGs[t]||(capGs[t]=new THREE.SphereGeometry(1,16,12,0,PI*2,0,PI*t));
+const capGs={},capG=t=>capGs[t]||(capGs[t]=new THREE.SphereGeometry(1,20,14,0,PI*2,0,PI*t));
+const backGs={},backG=(a,b)=>backGs[a+'_'+b]||(backGs[a+'_'+b]=new THREE.SphereGeometry(1,22,10,0,PI,a*PI,(b-a)*PI));
 const shirtGs={},shirtG=t=>shirtGs[t]||(shirtGs[t]=new THREE.SphereGeometry(1,16,12,0,PI*2,PI*t,PI*(1-t)));
 const coneU=new THREE.ConeGeometry(1,1,8),cylU=new THREE.CylinderGeometry(1,1,1,10),torU=new THREE.TorusGeometry(1,.09,6,24),arcU=new THREE.TorusGeometry(1,.08,6,20,PI),boxU=new THREE.BoxGeometry(1,1,1),skirtG=new THREE.CylinderGeometry(.42,1,1,16,1,true);
 /* ---------- 50 penteados ---------- */
 const hsP=(th,ph,k=1)=>[Math.sin(th)*Math.sin(ph)*.5*k,.35+Math.cos(th)*.47*k,.03+Math.sin(th)*Math.cos(ph)*.48*k];
-const CAP=['cap',.56,.42,1],CAPS=['cap',.5,.3,.985],CAPF=['cap',.6,.02,1.03],CAPL=['cap',.64,.6,1.03];
+const CAP=[['cap',.5,.32,1.02],['back',.5,.74,1.02],['fr']],CAPS=[['cap',.5,.28,.99],['back',.5,.68,.99]],CAPF=[['cap',.58,.02,1.03],['back',.5,.74,1.03]],CAPL=[['cap',.5,.28,1.03],['back',.5,.82,1.04],['fr']];
 const spikes=(n,len,r,tilt,th0=.45)=>{const a=[['c',0,.8+len/2,.02,r,len,0,0]];for(let i=0;i<n;i++){const ph=i/n*2*PI,[x,y,z]=hsP(th0,ph);a.push(['c',x+Math.sin(ph)*len*.3,y+len*.4,z+Math.cos(ph)*len*.3,r,len,Math.cos(ph)*tilt,-Math.sin(ph)*tilt])}return a};
 const mohawk=(r,h)=>[-.32,-.16,0,.16,.32,.44].map(z=>{const y=.33+.47*Math.sqrt(Math.max(0,1-(z/.5)**2));return['c',0,y+h*.35,z,r,h,z*1.5,0]});
 const curls=(n,r,thMax,skipFace=true)=>{const a=[];for(let i=0;i<n;i++){const th=thMax*Math.sqrt((i+.5)/n),ph=i*2.4;if(skipFace&&Math.cos(ph)<-.55&&th>.9)continue;const[x,y,z]=hsP(th,ph,1.04);a.push(['s',x,y,z,r])}return a};
 const dreads=(n,len,r)=>{const a=[];for(let i=0;i<n;i++){const ph=-1.9+i/(n-1)*3.8,x=Math.sin(ph)*.44,z=.04+Math.cos(ph)*.42;a.push(['y',x,.28-len/2,z,r,len,r,Math.cos(ph)*.12,-Math.sin(ph)*.12])}return a};
 const braid=(x,z,n,r0)=>{const a=[];for(let i=0;i<n;i++)a.push(['s',x,.2-i*.13,z+(i<2?0:.02),r0*(1-i*.06),r0*(1-i*.06)*1.15,r0*(1-i*.06)]);return a};
-const LONG=['y',0,-.08,.24,.44,.8,.3],BANG=['s',0,.64,-.33,.38,.12,.16],FLAT=['s',0,.25,.3,.44,.38,.3];
-const PONY=[['s',0,.55,.52,.15],['y',0,.22,.6,.1,.55,.1,.35,0]];
+const LONG=['s',0,-.12,.27,.47,.6,.3],BANG=['s',0,.64,-.33,.38,.12,.16],FLAT=['s',0,.25,.3,.44,.38,.3];
+const PONY=[['s',0,.52,.52,.13],['s',0,.22,.64,.12,.3,.12],['s',0,-.07,.68,.08,.16,.08]];
 const HAIRS=[
 ['Careca','m',[]],
-['Raspado','m',[['cap',.5,.3,.965]]],
+['Raspado','m',[['cap',.5,.28,.965],['back',.5,.66,.965]]],
 ['Curtinho','m',[CAPS]],
 ['Clássico','m',[CAP]],
 ['Topete','m',[CAPS,['s',0,.8,-.2,.26,.16,.24]]],
@@ -440,7 +462,7 @@ const HAIRS=[
 ['Dreads','m',[CAPS,...dreads(9,.5,.06)]],
 ['Tranças nagô','m',[CAPS,...[-.24,-.12,0,.12,.24].map(x=>['b',x,.66,.08,.05,.07,.8,0])]],
 ['Undercut','m',[['cap',.32,.15,1.04],['s',0,.78,-.08,.36,.14,.4]]],
-['Mullet','m',[CAPS,['y',0,.08,.3,.3,.45,.18,.25,0]]],
+['Mullet','m',[CAPS,['s',0,.05,.32,.36,.3,.2]]],
 ['Pompadour','m',[CAPS,['s',0,.84,-.16,.3,.22,.32]]],
 ['Anime','m',[CAP,...spikes(8,.42,.13,1.1,.75)]],
 ['Coque samurai','m',[CAPS,['s',0,.86,.2,.14]]],
@@ -451,8 +473,8 @@ const HAIRS=[
 ['Militar','m',[CAPS,['b',0,.74,.02,.66,.16,.7,0]]],
 ['Cachinhos','u',[CAP,...curls(22,.13,1.6)]],
 ['Rabo de cavalo','f',[CAP,...PONY]],
-['Rabo alto','f',[CAP,['s',0,.82,.38,.15],['y',0,.5,.62,.1,.65,.1,.5,0]]],
-['Maria-chiquinha','f',[CAP,['s',-.5,.45,.22,.13],['s',.5,.45,.22,.13],['y',-.56,.12,.26,.1,.5,.1,0,-.25],['y',.56,.12,.26,.1,.5,.1,0,.25]]],
+['Rabo alto','f',[CAP,['s',0,.84,.36,.14],['s',0,.52,.62,.12,.32,.12],['s',0,.2,.66,.08,.16,.08]]],
+['Maria-chiquinha','f',[CAP,['s',-.5,.45,.22,.12],['s',.5,.45,.22,.12],['s',-.6,.15,.24,.11,.28,.11],['s',.6,.15,.24,.11,.28,.11],['s',-.63,-.12,.25,.07,.14,.07],['s',.63,-.12,.25,.07,.14,.07]]],
 ['Coque alto','f',[CAP,['s',0,.9,.12,.2]]],
 ['Dois coques','f',[CAP,['s',-.32,.8,.05,.17],['s',.32,.8,.05,.17]]],
 ['Chanel','f',[CAPL,['s',0,.24,.16,.56,.38,.42]]],
@@ -460,7 +482,7 @@ const HAIRS=[
 ['Longo cacheado','f',[CAPL,LONG,...[-.4,-.2,0,.2,.4].flatMap(x=>[['s',x,-.1,.3,.14],['s',x*1.05,-.38,.28,.13]])]],
 ['Trança','f',[CAP,...braid(0,.5,7,.11)]],
 ['Duas tranças','f',[CAP,...braid(-.4,.12,6,.1),...braid(.4,.12,6,.1)]],
-['Rabo lateral','f',[CAP,['s',.42,.38,.28,.15],['y',.52,.05,.3,.11,.55,.11,0,.2]]],
+['Rabo lateral','f',[CAP,['s',.42,.38,.28,.14],['s',.55,.05,.3,.12,.3,.12],['s',.58,-.24,.3,.08,.15,.08]]],
 ['Franja e longo','f',[CAPL,BANG,LONG]],
 ['Meio preso','f',[CAPL,LONG,['s',0,.68,.46,.12]]],
 ['Faixa','f',[CAPL,LONG,['At',0,.36,.02,.55,-.35]]],
@@ -508,17 +530,19 @@ function boxer(p,lk){lk=normLook(lk);const L=M2=>TM(M2);
  for(const sx of [-1,1])body.add(part(sphG,sm,sx*.3,.98,0,.13,.11,.13,1.1));
  // cabelo
  const gold=mm(0xffd34d);
- for(const q of HAIRS[lk.h][2]){let t=q[0],mat=hm;if(t[0]=='A'){t=t.slice(1);mat=t=='c'?gold:am}let m;
+ const hparts=HAIRS[lk.h][2].flatMap(q=>Array.isArray(q[0])?q:[q]);
+ for(const q of hparts){let t=q[0],mat=hm;if(t[0]=='A'){t=t.slice(1);mat=t=='c'?gold:am}let m;
   if(t=='cap'){m=new THREE.Mesh(capG(q[1]),mat);m.scale.setScalar(.52*(q[3]||1));m.position.set(0,.35,.03);m.rotation.x=q[2];ol(m,om,1.06)}
+  else if(t=='back'){m=new THREE.Mesh(backG(q[1],q[2]),mat);m.scale.setScalar(.52*(q[3]||1));m.position.set(0,.35,.03);ol(m,om,1.06)}
   else if(t=='s'){m=new THREE.Mesh(sphG,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[5]??q[4],q[6]??q[4]);if(Math.max(q[4],q[5]??0)>.12)ol(m,om,1.1)}
   else if(t=='c'){m=new THREE.Mesh(coneU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[5],q[4]);m.rotation.set(q[6]||0,0,q[7]||0)}
   else if(t=='y'){m=new THREE.Mesh(cylU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[5],q[6]??q[4]);m.rotation.set(q[7]||0,0,q[8]||0);if(q[4]>.09)ol(m,om,1.08)}
   else if(t=='b'){m=new THREE.Mesh(boxU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[5],q[6]);m.rotation.x=q[7]||0}
   else if(t=='t'){m=new THREE.Mesh(q[0]=='At'?arcU:torU,mat);m.position.set(q[1],q[2],q[3]);m.scale.set(q[4],q[4],q[4]*1.6);m.rotation.x=q[5]}
   if(m)headG.add(m)}
- {const parts=HAIRS[lk.h][2],cap=parts.find(q=>q[0]=='cap'),hi=L(tint(HC[lk.hc],.45));mats.push(hi);
+ {const parts=hparts,cap=parts.find(q=>q[0]=='cap'),hi=L(tint(HC[lk.hc],.45));mats.push(hi);
   if(cap||lk.h===10||lk.h===42){const [x,y,z]=cap?hsP(.42,PI*1.18,1.06):[-.2,.92,-.05];const h=new THREE.Mesh(sphG,hi);h.position.set(x,y,z);h.scale.set(.15,.035,.08);h.rotation.set(-.5,-.35,.3);headG.add(h)}
-  if(cap&&cap[1]>=.55&&!NOFRINGE.has(lk.h)){for(let k=-2;k<=2;k++){const [x,y,z]=hsP(1.12+Math.abs(k)*.06,PI+k*.36,1.03);const t=new THREE.Mesh(sphG,hm);t.position.set(x,y,z);t.scale.set(.12,.1,.07);t.rotation.set(-.6,k*.36,0);ol(t,om,1.12);headG.add(t)}
+  if(parts.some(q=>q[0]=='fr')&&!NOFRINGE.has(lk.h)){for(const k of [-1,0,1]){const [x,y,z]=hsP(1.06+Math.abs(k)*.05,PI+k*.44,1.04);const t=new THREE.Mesh(sphG,hm);t.position.set(x,y,z);t.scale.set(.18,.12,.09);t.rotation.set(-.8,k*.44,k*.3);ol(t,om,1.1);headG.add(t)}
    for(const sx of [-1,1]){const [x,y,z]=hsP(1.42,PI+sx*1.25,1.02);const t=new THREE.Mesh(sphG,hm);t.position.set(x,y,z);t.scale.set(.07,.13,.07);ol(t,om,1.12);headG.add(t)}}}
  // roupa
  const T=(t,c,map,opt={})=>{const m=map?TM(0xffffff,{map}):mm(c);if(map)mats.push(m);const o=new THREE.Mesh(shirtG(t),m);o.position.set(0,.84,0);o.scale.set(.375,.375,.315);ol(o,om,1.07);body.add(o);
@@ -607,7 +631,7 @@ function layoutHud(){const hs=humans(),n=hs.length,side=innerWidth>=innerHeight;
   else Object.assign(s,{left:0,top:k*50+'%',width:'100%',height:'50%'})})}
 const msg=(p,t)=>{if(!p.hud)return;const m=p.hud.msg;m.textContent=t;m.classList.remove('on');void m.offsetWidth;m.classList.add('on')};
 function toast(p,k){const pu=PU[k],h=p.hud,nw=!album.includes(k);
- h.toast.innerHTML=`<em class="r${pu[1]}">${nw?'NOVA LUVA! ':''}${RAR[pu[1]]}</em><b style="color:${hex(pu[2])}">${esc(pu[0])}</b><small>${esc(desc(pu[3]))}</small>`;
+ h.toast.innerHTML=`<em class="r${pu[1]}">${RAR[pu[1]]}</em><b style="color:${hex(pu[2])}">${esc(pu[0])}</b><small>${esc(desc(pu[3]))}</small>${nw?`<small><strong>Gostou? Compre na loja por ${PRICE[pu[1]]} nocautes para usar sempre.</strong></small>`:''}`;
  h.toast.classList.remove('hide');clearTimeout(h._tt);h._tt=setTimeout(()=>h.toast.classList.add('hide'),3200)}
 function feed(a,b,verb='nocauteou'){const f=document.createElement('div');const x=document.createElement('b'),y=document.createElement('b');x.textContent=a;y.textContent=b;
  f.append(x,' '+verb+' ',y);$('#feed').prepend(f);setTimeout(()=>f.remove(),4500);while($('#feed').children.length>5)$('#feed').lastChild.remove()}
@@ -709,6 +733,7 @@ function ko(v,aid){v.dead=true;v.rt=3;v.hp=0;v.deaths++;v.grp.visible=false;v.pu
  burst(v.pos.clone().setY(v.pos.y+1),v.color,22,7);burst(v.pos.clone().setY(v.pos.y+1.6),0xffe14d,10,4);
  const a=byId(aid);if(net.on&&v.kind=='me'){net.dc++;net.kb=aid||null}
  if(a&&a.kind!='remote'&&a!==v)a.score++;
+ if(a&&a.human&&a!==v)addKo();
  feed(a?a.name:'Alguém',v.name);
  if(a&&a.human&&a!==v){msg(a,'Nocaute em '+v.name+'!');snd(660,.16,'triangle',.12,1320)}
  if(v.human){v.hud.dead.classList.remove('hide');snd(200,.5,'sawtooth',.06,60)}
@@ -749,7 +774,7 @@ function chestDamage(c,n,oid){if(c.hp<=0||!chests.includes(c))return;c.hp-=n;dra
   dropChest(chests.indexOf(c),true);chestTimers.push(6+Math.random()*6);
   const o=byId(oid);if(o&&o.kind!='remote')givePU(o,k);else if(net.on){net.co.push([++net.coSeq,oid,k]);net.co=net.co.slice(-6)}}}
 function givePU(p,k){const pu=PU[k];if(!pu)return;p.pu=k;p.puT=DUR[pu[1]];setMods(p);hudPU2(p);if(pu[3].sh)p.sh=pu[3].sh;
- if(p.human){toast(p,k);if(!album.includes(k)){album.push(k);LS.set('luvas_album',album);albBtn()}snd(523,.12,'sine',.1);setTimeout(()=>snd(784,.18,'sine',.1),110)}
+ if(p.human){toast(p,k);snd(523,.12,'sine',.1);setTimeout(()=>snd(784,.18,'sine',.1),110)}
  if(pu[1]>=2)feed(p.name,pu[0],'pegou a')}
 
 /* ================= física ================= */
@@ -1000,7 +1025,7 @@ addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);layoutHud()});
 function clearMatch(){P.forEach(p=>{S.remove(p.grp);if(p.cam)S.remove(p.cam)});[...FX,...RK,...RINGS,...BOLTS].forEach(f=>S.remove(f.m));
  P=[];FX=[];RK=[];RINGS=[];BOLTS=[];clearChests();$('#hud').innerHTML='';$('#feed').innerHTML=''}
 function startMatch(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}
- clearMatch();buildWorld(cfg.map|0);const mode=cfg.mode;{const gb=document.querySelector('#mins [aria-pressed=true]');cfg.mins=gb?+gb.dataset.v:5}matchT=cfg.mins*60;net.rest=false;
+ clearMatch();buildWorld(cfg.map|0);matchKos=0;const mode=cfg.mode;{const gb=document.querySelector('#mins [aria-pressed=true]');cfg.mins=gb?+gb.dataset.v:5}matchT=cfg.mins*60;net.rest=false;
  if(mode=='online'){P.push(mk({id:net.me,name:nick()||'Você',ci:myCi(),kind:'me',look:myLook}))}
  else{const duo=mode=='duo';P.push(mk({id:'L0',name:duo?'Jogador 1':'Você',ci:0,kind:'me',look:myLook}));if(duo)P.push(mk({id:'L1',name:'Jogador 2',ci:1,kind:'p2',look:randLook(1001)}));
   for(let i=0;i<cfg.bots;i++)P.push(mk({id:'B'+i,name:PAL[2+i][0],ci:2+i,kind:'bot'}))}
@@ -1017,9 +1042,9 @@ function finish(){const top=Math.max(...P.map(p=>p.score)),ws=P.filter(p=>p.scor
 function end(w,ws){mL=mR=false;if(!net.on)try{document.exitPointerLock()}catch(e){}
  $('#wint').textContent=w?(w.kind=='me'?'Você venceu!':w.name+' venceu!'):(ws.some(p=>p.kind=='me')?'Empate! Você está entre os campeões':'Empate!');
  $('#rank').innerHTML=[...P].sort((a,b)=>b.score-a.score).map((p,i)=>`<tr><td>${i+1}º</td><td><span class="dot" style="background:${hex(p.color)}"></span>${esc(p.name)}</td><td class="n">${p.score} nocautes</td></tr>`).join('');
- if(net.on){net.rest=true;matchT=0;$('#endn').textContent='O tempo acabou! Nova rodada começa em alguns segundos…';$('#enda').classList.add('hide');$('#end').classList.remove('hide');
+ if(net.on){net.rest=true;matchT=0;$('#endn').textContent=`O tempo acabou! Você ganhou ${matchKos} nocautes para a loja. Nova rodada começa em alguns segundos…`;matchKos=0;$('#enda').classList.add('hide');$('#end').classList.remove('hide');
   setTimeout(()=>{if(!net.on)return;const me=P[0];me.score=0;net.dc=0;net.kb=null;matchT=cfg.mins*60;net.rest=false;net.restT=performance.now();spawn(me);board();$('#end').classList.add('hide')},7000)}
- else{running=false;$('#endn').textContent='O tempo acabou!';$('#enda').classList.remove('hide');setTimeout(()=>$('#end').classList.remove('hide'),600)}}
+ else{running=false;$('#endn').textContent=`O tempo acabou! Você ganhou ${matchKos} nocautes para a loja de luvas (total: ${kos}).`;$('#enda').classList.remove('hide');setTimeout(()=>$('#end').classList.remove('hide'),600)}}
 
 
 /* ================= online ================= */
@@ -1050,7 +1075,7 @@ function netIn(){const g=net.gr;if(!g)return;let peers=[];try{peers=g.peers()}ca
    else if(v[1]==='r')rocket(e,true,new V3(+v[2],+v[3],+v[4]),new V3(+v[5],+v[6],+v[7]));
    else if(v[1]==='w')ring(+v[2],+v[3],e.pu>=0?PU[e.pu][2]:0xffffff)}
   const dc=s.dc|0,ldc=net.lastDc[pe.peer];
-  if(dc>ldc){const kb=s.kb,kn=kb===me.id?'Você':((byId(kb)||{}).name||'Alguém');feed(kn,e.name);if(kb===me.id){me.score++;msg(me,'Nocaute em '+e.name+'!');snd(660,.16,'triangle',.12,1320);board()}}
+  if(dc>ldc){const kb=s.kb,kn=kb===me.id?'Você':((byId(kb)||{}).name||'Alguém');feed(kn,e.name);if(kb===me.id){me.score++;addKo();msg(me,'Nocaute em '+e.name+'!');snd(660,.16,'triangle',.12,1320);board()}}
   net.lastDc[pe.peer]=dc}
  for(let i=P.length-1;i>=1;i--)if(P[i].kind=='remote'&&!live.has(P[i].id)){S.remove(P[i].grp);P.splice(i,1);board()}
  // anfitrião dos baús: quem já publica baús e tem o menor rótulo; senão, o menor rótulo da sala
@@ -1182,10 +1207,20 @@ $('#resume').onclick=()=>{setPause(false);tryLock()};
 $('#mkroom').onclick=()=>{tryFull();joinGame(newCode(),true)};
 $('#jroom').onclick=()=>{tryFull();joinGame($('#rcode').value,false)};
 $('#rcode').addEventListener('keydown',e=>{if(e.key=='Enter')joinGame($('#rcode').value,false)});
-function drawAlbum(){$('#albs').textContent=`Você já encontrou ${album.length} de 50 luvas. Toque numa luva encontrada para usá-la como padrão em toda luta. As lendárias aparecem em menos de 1 a cada 20 baús.`;
- $('#albg').innerHTML=`<button data-k="-1" class="${eq<0?'eq':''}"><i style="background:#e23b3b"></i>Luva vermelha<small>Normal, sem poderes</small>${eq<0?'<em>Usando</em>':''}</button>`+PU.map((u,i)=>album.includes(i)?`<button data-k="${i}" class="${eq===i?'eq':''}"><i style="background:${hex(u[2])}"></i>${esc(u[0])}<small class="r${u[1]}">${RAR[u[1]]}</small><small>${esc(desc(u[3]))}</small>${eq===i?'<em>Usando</em>':''}</button>`
-  :`<div class="no"><i style="background:#ccc"></i>???<small class="r${u[1]}">${RAR[u[1]]}</small></div>`).join('')}
-$('#albg').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;eq=+b.dataset.k;LS.set('luvas_eq',eq);drawAlbum();albBtn()});
+let albF='all';
+function drawAlbum(){$('#kosv').textContent=kos+' nocautes';
+ $('#albs').textContent=`Cada nocaute que você dá em qualquer luta vale 1 para gastar aqui. Você tem ${album.length} de ${PU.length} luvas. Toque em "Usar" para lutar sempre com ela.`;
+ document.querySelectorAll('#albf button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===albF));
+ const ok=i=>albF==='all'||(albF==='own'?album.includes(i):PU[i][1]===+albF);
+ $('#albg').innerHTML=(albF==='all'||albF==='own'?`<div class="${eq<0?'eq':''}"><i style="background:#e23b3b"></i>Luva vermelha<small>Normal, sem poderes</small>${eq<0?'<em>Usando</em>':'<button class="btn sm" data-k="-1">Usar</button>'}</div>`:'')+
+  PU.map((u,i)=>{if(!ok(i))return'';const own=album.includes(i),pr=PRICE[u[1]];
+   return`<div class="${eq===i?'eq':''}${own?'':' lock'}"><i style="background:${hex(u[2])}"></i>${esc(u[0])}<small class="r${u[1]}">${RAR[u[1]]}</small><small>${esc(desc(u[3]))}</small>
+   ${own?(eq===i?'<em>Usando</em>':`<button class="btn sm" data-k="${i}">Usar</button>`):`<button class="btn sm pri" data-buy="${i}" ${kos<pr?'disabled':''}>Comprar · ${pr}</button>`}</div>`}).join('')}
+$('#albf').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;albF=b.dataset.f;drawAlbum()});
+$('#albg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.buy!=null){const i=+b.dataset.buy,pr=PRICE[PU[i][1]];if(kos<pr||album.includes(i))return;kos-=pr;LS.set('luvas_kos',kos);album.push(i);LS.set('luvas_album',album);if(AC||true)try{snd(523,.12,'sine',.1)}catch(x){}}
+ else if(b.dataset.k!=null){eq=+b.dataset.k;LS.set('luvas_eq',eq)}
+ drawAlbum();albBtn()});
 $('#albb').onclick=()=>{drawAlbum();$('#album').classList.remove('hide')};
 $('#albx').onclick=()=>$('#album').classList.add('hide');
 $('#helpb').onclick=()=>$('#help').classList.remove('hide');$('#helpx').onclick=()=>$('#help').classList.add('hide');
