@@ -756,7 +756,10 @@ const CB={gancho:['Gancho Duplo','soco, soco, forte','o forte dobra de força e 
  golfinho:['Salto do Golfinho','pule para fora da água e dê um soco forte no ar','mergulho explosivo enorme']};
 function sfxSwing(p,strong){const d=p.human?0:near(p);if(d<25)snd(strong?260:380,.12,'triangle',.05*(1-d/25),strong?90:160)}
 function sfxHit(p,strong){const d=p.human?0:near(p);if(d<20)snd(strong?90:140,.14,'sine',.18*(1-d/20),50)}
-function comboFx(p,cb){if(cb=='meteoro'||cb=='golfinho')sfxSwing(p,true);p.ca={k:cb,t:0,d:CBD[cb]};p.cbN++;p.cbK=cb;if(cb=='metra'||cb=='furacao'){if(p.human)setTimeout(()=>msg(p,'Segure o soco para continuar!'),700);else p.holdT=.2+Math.random()*2.5}burst(p.pos.clone().setY(p.pos.y+1.4*p.scl),0xffe14d,10,4);if(p.human)msg(p,CB[cb][0]+'!')}
+const CBF=new Set(['metra','onda','bolhas']),SUPX=6;
+const cbName=(p,cb)=>p.pu===SUPREMA?(CBF.has(cb)?'Suprema ':'Supremo ')+CB[cb][0]:CB[cb][0];
+function supOn(a){return a&&a.pu===SUPREMA&&(performance.now()<(a.supU||0)||a.multi||a.flurry||a.spinA||a.whirl||a.slam)}
+function comboFx(p,cb){if(p.pu===SUPREMA){p.supU=performance.now()+1800;const q=p.pos.clone().setY(p.pos.y+1.2*p.scl);burst(q,0xffffff,22,8);burst(q,0x2f86ff,16,7);if(near(p)<30)snd(1046,.18,'sine',.08,1568)}if(cb=='meteoro'||cb=='golfinho')sfxSwing(p,true);p.ca={k:cb,t:0,d:CBD[cb]};p.cbN++;p.cbK=cb;if(cb=='metra'||cb=='furacao'){if(p.human)setTimeout(()=>msg(p,'Segure o soco para continuar!'),700);else p.holdT=.2+Math.random()*2.5}burst(p.pos.clone().setY(p.pos.y+1.4*p.scl),0xffe14d,10,4);if(p.human)msg(p,cbName(p,cb)+'!')}
 const bon=p=>1+Math.min(.5,(p.chT>0?p.ch:0)*.05);
 function regHit(p){p.ch=p.chT>0?p.ch+1:1;p.chT=2}
 function slam(p){const gf=p.slamK==='golfinho',R=gf?6.5:4.5,D=gf?30:22;ring(p.pos.x,p.pos.z,gf?0x4fc3ff:0xffe14d);burst(p.pos.clone().setY(p.pos.y+.3),gf?0xbfeaff:0xd9c9a0,gf?30:18,gf?9:7);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);if(near(p)<30)snd(80,.35,'sine',.22,40);
@@ -808,7 +811,7 @@ function strike(p,strong,mult,second,cb){const m=p.M,f=fw(p),rng=2.3*m.r*(p.scl>
  if(strong&&m.wave&&!second){ring(best.pos.x,best.pos.z,PU[p.pu][2]);netPush(['w',r2(best.pos.x),r2(best.pos.z)],p);
   for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-best.pos.x,ez=o.pos.z-best.pos.z,el=Math.hypot(ex,ez);if(el<5.5)deliver(o,p,{d:dmg*.6,kx:ex/(el||1)*7,kz:ez/(el||1)*7,f:16})}}
  if(m.multi&&!second)p.multi={t:.12,strong}}
-function deliver(v,a,h){if(v.kind=='remote'){if(a.kind=='me')netPush(['h',v.id,r2(h.d),r2(h.kx),r2(h.kz),h.f,r2(h.st||0)],a)}else applyHit(v,a.id,h)}
+function deliver(v,a,h){if(!(h.f&64)&&supOn(a)){h=Object.assign({},h,{d:h.d*SUPX,kx:h.kx*2.5,kz:h.kz*2.5,st:Math.max(h.st||0,.8)});const q=v.pos.clone().setY(v.pos.y+1.1*(v.scl||1));burst(q,0xffffff,12,7);burst(q,0x2f86ff,8,6)}if(v.kind=='remote'){if(a.kind=='me')netPush(['h',v.id,r2(h.d),r2(h.kx),r2(h.kz),h.f,r2(h.st||0)],a)}else applyHit(v,a.id,h)}
 function applyHit(v,aid,h){if(v.dead||v.inv>0)return;const a=byId(aid);let d=clamp(+h.d||0,0,120),kx=clamp(+h.kx||0,-30,30),kz=clamp(+h.kz||0,-30,30),f=h.f|0;
  if(v.bl&&a){const dx=a.pos.x-v.pos.x,dz=a.pos.z-v.pos.z,l=Math.hypot(dx,dz)||1,F=fw(v);
   if((dx*F[0]+dz*F[1])/l>.2){d*=.25;kx*=.3;kz*=.3;f&=64;v.cntT=.8;burst(v.pos.clone().setY(v.pos.y+1.4),0x9fd4ff,5,3);if(v.human){snd(900,.06,'square',.05,600);msg(v,'Defendeu! Solte um forte para contra-atacar')}}else{v.ch=0;v.chT=0}}else{v.ch=0;v.chT=0}
@@ -1308,7 +1311,7 @@ const CTL={cpu:`<div><b>Teclado e mouse</b><kbd>W A S D</kbd> andar · <kbd>Mous
  <div><b>Luvas especiais</b>Ache baús e soque até abrir. Os comuns ficam pelo campo; os raros, épicos e lendários estão no alto dos morros e no fundo do lago, e precisam de muitos socos.</div>`,
  duo:`<div><b>Jogador 1 (esquerda)</b><kbd>W A S D</kbd> andar · <kbd>Mouse</kbd> olhar · <kbd>Clique</kbd> soco · <kbd>Botão direito</kbd> soco forte · <kbd>Q</kbd> defender · <kbd>Espaço</kbd> pular</div>
  <div><b>Jogador 2 (direita)</b>Controle: <kbd>RT</kbd> soco, <kbd>RB</kbd> soco forte, <kbd>LT</kbd> defender, <kbd>A</kbd> pular. Teclado: <kbd>I J K L</kbd> andar · <kbd>Setas</kbd> olhar · <kbd>Enter</kbd> soco · <kbd>Shift dir.</kbd> forte · <kbd>P</kbd> defender · <kbd>O</kbd> pular</div>`};
-{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.</div>`;CTL.cpu+=cc;CTL.duo+=cc}
+{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.<br><strong>👑 Com a Luva Suprema</strong>, todos viram combos Supremos (ex.: Supremo Gancho Duplo, Suprema Metralhadora) com força 6 vezes maior e empurrão gigante.</div>`;CTL.cpu+=cc;CTL.duo+=cc}
 CTL.online=CTL.cpu;
 CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div class="cbx">[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
 function modeUI(){const m=cfg.mode,duo=m=='duo',r=$('#bots');$('#offrows').classList.toggle('hide',m=='online');$('#onl').classList.toggle('hide',m!='online');
