@@ -382,7 +382,7 @@ const PU=[
 ['Luva Aurora',2,0x7affc8,{frz:1,burn:1,reg:4}],['Luva Meteoro de Fogo',2,0xff3a1a,{rkt:1,wave:1,burn:1}],
 ['Luva do Dragão Dourado',3,0xffc000,{d:1.5,burn:1,wave:1,rkt:1,df:.8}],['Luva do Rei Leão',3,0xe8a000,{d:1.7,k:1.6,s:1.2,sh:50}],['Luva Cósmica',3,0x2a0a5a,{chain:1,multi:1,rkt:1,inv:1}],
 ['Luva do Trovão Eterno',3,0xfff27a,{chain:1,stun:.5,s:1.25,crit:.25}],['Luva Arco-íris Lendária',3,0xff66cc,{burn:1,frz:1,poi:1,life:.3,reg:4,crit:.3}],
-['Luva Suprema',4,0xff2a9d,{d:1.8,s:1.3,c:.65,df:.6,reg:5,crit:.3,life:.3,chain:1,wave:1,rkt:1,burn:1,sh:60}]];
+['Luva Suprema',4,0xf4f8ff,{d:1.8,s:1.3,c:.65,df:.6,reg:5,crit:.3,life:.3,chain:1,wave:1,rkt:1,burn:1,sh:60}]];
 const SUPREMA=PU.length-1;
 function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  if(m.d>1)o.push('+'+pc(m.d)+' de força');if(m.d<1)o.push('-'+pc(m.d)+' de força');if(m.s>1)o.push('corre mais');if(m.s<1)o.push('anda mais devagar');
@@ -478,6 +478,9 @@ const decoMats={},dM=(c,basic,o)=>{const key=c+'_'+(basic?1:0)+(o?'o':'');return
 const octG=new THREE.OctahedronGeometry(1),auraTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');if(g){const r=g.createRadialGradient(32,32,2,32,32,32);if(r){r.addColorStop(0,'rgba(255,255,255,.9)');r.addColorStop(.4,'rgba(255,255,255,.35)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64)}}return new THREE.CanvasTexture(c)})();
 function decorateGlove(g,k,om){const U=g.userData,d=U.deco;if(!d)return;while(d.children.length)d.remove(d.children[0]);const pu=k>=0?PU[k]:null,side=U.side;
  U.bandM.color.setHex(pu?[0xffffff,0xdfe8ff,0xd9c2ff,0xffd34d,0xff66cc][pu[1]]:0xffffff);U.strapM.color.setHex(pu?shade(pu[2],.45):0x2b2f3a);
+ if(k===SUPREMA){U.bandM.color.setHex(0xffffff);U.strapM.color.setHex(0xffffff);const bs=U.base||1.15;g.scale.setScalar(bs);
+  const orb=new THREE.Group();orb.position.set(0,.06,.02);d.add(orb);for(let i=0;i<3;i++){const c=supCrown(om);c.userData.i=i;orb.add(c)}FLOATS.add(orb);floatStep(orb,performance.now()/1000);
+  g.traverse(o=>o.layers.mask=g.layers.mask);return}
  if(pu){const m=pu[3],R=pu[1];
   const A=(geo,col,x,y,z,sx,sy,sz,rx=0,ry=0,rz=0,basic=false,olk=0)=>{const o=new THREE.Mesh(geo,dM(col,basic));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.rotation.set(rx,ry,rz);if(olk&&om)ol(o,om,olk);d.add(o);return o};
   if(m.burn)for(const [x,z,h] of [[0,.04,.26],[-.08,.12,.2],[.08,.12,.2],[0,.2,.16]]){A(coneU,0xff7b00,x,.2+h/2,z,.07,h,.07,-.35,0,0,true);A(coneU,0xffe14d,x,.18+h*.35,z-.01,.04,h*.6,.04,-.35,0,0,true)}
@@ -500,7 +503,15 @@ function decorateGlove(g,k,om){const U=g.userData,d=U.deco;if(!d)return;while(d.
   else if(m.sh)A(boxU,0xbfc6cf,...top(),.16,.035,.18,0,0,0,false,1.12);
   else if(R==2)A(octG,0xb06bff,...top(.23),.05,.07,.05,0,.6,0,false,1.2)}
  g.traverse(o=>o.layers.mask=g.layers.mask)}
-function gloveMat(gm,k){const pu=k>=0?PU[k]:null,t=pu?patternTex(k):null;if(gm.map!==t){gm.map=t;gm.needsUpdate=true}gm.color.setHex(pu?(t?0xffffff:pu[2]):0xe23b3b);gm.emissive.setHex(pu?pu[2]:0);gm.emissiveIntensity=pu?(pu[1]>=2?.22:.1):0}
+const FLOATS=new Set();
+function supCrown(om){const c=new THREE.Group(),W=0xffffff,B=0x2f86ff,m=(geo,col,x,y,z,sx,sy,sz,basic,olk)=>{const o=new THREE.Mesh(geo,dM(col,basic));o.position.set(x,y,z);o.scale.set(sx,sy,sz);if(olk&&om)ol(o,om,olk);c.add(o);return o};
+ m(cylU,W,0,0,0,1,.5,1,false,1.12);
+ for(let j=0;j<5;j++){const a=j*2*PI/5,x=Math.sin(a)*.82,z=Math.cos(a)*.82;m(coneU,W,x,.5,z,.3,.62,.3,false,1.15);m(sphG,B,x,.85,z,.13,.13,.13,true)}
+ for(let j=0;j<3;j++){const a=j*2*PI/3,o=m(octG,B,Math.sin(a)*1.02,0,Math.cos(a)*1.02,.2,.26,.12,true);o.rotation.y=a}
+ c.scale.setScalar(.075);return c}
+function floatStep(orb,t){if(!orb.parent){FLOATS.delete(orb);return}orb.rotation.y=t*1.3;orb.children.forEach(c=>{const i=c.userData.i,a=i*2*PI/3;c.position.set(Math.sin(a)*.34,.1+Math.sin(t*2.2+i*2.1)*.035,Math.cos(a)*.34);c.rotation.set(.25,t*1.6,0)})}
+(function floatLoop(){const t=performance.now()/1000;FLOATS.forEach(o=>floatStep(o,t));requestAnimationFrame(floatLoop)})();
+function gloveMat(gm,k){if(k===SUPREMA){if(gm.map){gm.map=null;gm.needsUpdate=true}gm.color.setHex(0xffffff);gm.emissive.setHex(0x1a2230);gm.emissiveIntensity=1;return}const pu=k>=0?PU[k]:null,t=pu?patternTex(k):null;if(gm.map!==t){gm.map=t;gm.needsUpdate=true}gm.color.setHex(pu?(t?0xffffff:pu[2]):0xe23b3b);gm.emissive.setHex(pu?pu[2]:0);gm.emissiveIntensity=pu?(pu[1]>=2?.22:.1):0}
 const SKIN=[0xf5d0b0,0xf0bb92,0xe0a77a,0xd99a6c,0xc68a5e,0xa86f48,0x8d5a3b,0x6b4429];
 const HC=[0x2b2b2b,0x111111,0x5a3a22,0x8a5a2b,0xc98a3a,0xe8c070,0xf6e2a8,0xb5482a,0x9a9a9a,0xf4f4f4,0xff7ab8,0x4fa3ff,0x6fd36f,0xa45cff];
 const OC=[0xe23b3b,0x1e6bff,0x2ecc71,0xffb400,0xa45cff,0xff7a1a,0x15c4c9,0xf05bd0,0x2b2f3a,0xf4f4f4,0x8a5a2b,0xffe14d];
@@ -1115,7 +1126,7 @@ function medkitStep(dt,t){for(const m of MK){if(!m.on){m.t-=dt;if(m.t<=0){m.on=t
   if(p.human){msg(p,'+40 de vida');snd(440,.12,'sine',.1,880);setTimeout(()=>snd(660,.16,'sine',.1,1320),100)}break}}}}
 /* ---------- partículas das luvas ---------- */
 const _wp=new V3();
-function gloveFx(p,dt){if(p.dead||p.pu<0)return;p.gfx=(p.gfx||0)-dt;if(p.gfx>0)return;p.gfx=.09;const m=p.M,R=PU[p.pu][1];
+function gloveFx(p,dt){if(p.dead||p.pu<0||p.pu===SUPREMA)return;p.gfx=(p.gfx||0)-dt;if(p.gfx>0)return;p.gfx=.09;const m=p.M,R=PU[p.pu][1];
  const col=m.burn?(Math.random()<.5?0xff7b00:0xffd84f):m.frz?0xdff6ff:(m.chain||m.stun)?0xfff27a:m.poi?0x63d33c:R==3?0xffe58a:R==2?0xd2a6ff:null;if(col==null)return;
  const gs=p.human&&p.fpL?[p.fpL,p.fpR]:[p.gL,p.gR],g=gs[Math.random()<.5?0:1];if(!g.visible&&!p.human)return;g.getWorldPosition(_wp);
  const f=new THREE.Mesh(fxG,bmat(col));f.position.copy(_wp).add(new V3((Math.random()-.5)*.15,.05,(Math.random()-.5)*.15));f.scale.setScalar(p.human?.45:.8);S.add(f);
