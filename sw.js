@@ -1,5 +1,5 @@
 // Guarda o jogo no aparelho para abrir rápido e funcionar sem internet depois da primeira vez.
-const CACHE = 'uppercut-v9';
+const CACHE = 'uppercut-v10';
 const FILES = [
   './',
   './index.html',

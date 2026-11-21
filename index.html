@@ -56,6 +56,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 .alb img{display:block;width:72px;height:72px;margin:-2px auto 4px;border-radius:14px;background:radial-gradient(circle at 50% 45%,#fff,#e6eef7 70%)}
 .alb div{display:flex;flex-direction:column;gap:2px}.alb div .btn{margin-top:auto;min-height:34px;padding:4px 8px;font-size:13px;white-space:nowrap}.alb div em{margin-top:auto;align-self:flex-start}
 .alb div.lock{background:#fff}.alb div.eq{border-color:var(--blue);background:#e3edff}.alb .btn[disabled]{opacity:.45;cursor:not-allowed}
+.alb em.sup{background:#ffe0f0;color:#a0105a;font-size:12px;padding:4px 8px;border-radius:8px;white-space:normal}
 .kos{font:400 24px 'Lilita One',sans-serif;background:var(--gold);color:var(--ink);border-radius:14px;padding:6px 14px;white-space:nowrap}
 #albf{margin:4px 0 0}
 .alb button{all:unset;box-sizing:border-box;cursor:pointer;border-radius:12px;padding:8px;font-size:13px;font-weight:800;border:2px solid var(--line);background:var(--soft);min-height:74px;color:var(--ink)}
@@ -63,7 +64,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 .alb button small{display:block;font-weight:600;opacity:.75}
 .alb button:hover{border-color:var(--blue)}.alb button:focus-visible{outline:3px solid var(--gold)}
 .alb button.eq{border-color:var(--blue);background:#e3edff}.alb em{display:inline-block;margin-top:4px;font-style:normal;font-size:12px;background:var(--blue);color:#fff;border-radius:8px;padding:1px 8px}
-.r0{color:#4c8a2c}.r1{color:#1e6bff}.r2{color:#8a3fe0}.r3{color:#b07d00}
+.r4{color:#e0218a}.r0{color:#4c8a2c}.r1{color:#1e6bff}.r2{color:#8a3fe0}.r3{color:#b07d00}
 .olist{display:grid;gap:6px}
 .pr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--soft);border-radius:12px;padding:8px 10px}
 .pr .nm{flex:1;font-weight:800}.pr .tg{font-size:12px;font-weight:800;border-radius:10px;padding:2px 8px;background:#fff}
@@ -351,7 +352,7 @@ function buildWorld(mi){if(mi===MI)return;MI=mi;MAP=MAPS[mi]||MAPS[0];seed=11+mi
 buildWorld(0);
 
 /* ================= as 50 luvas ================= */
-const RAR=['Comum','Rara','Épica','Lendária'],RCOL=[0x9ccf6b,0x3d8bff,0xa45cff,0xffc21a],CHP=[6,10,16,26],RW=[55,30,11,4],DUR=[30,25,22,20];
+const RAR=['Comum','Rara','Épica','Lendária','Mítica'],RCOL=[0x9ccf6b,0x3d8bff,0xa45cff,0xffc21a,0xff2a9d],CHP=[6,10,16,26,40],RW=[55,30,11,4],DUR=[30,25,22,20,20];
 const PU=[
 ['Luva de Ferro',0,0x8a939e,{d:1.35}],['Luva Pena',0,0xf3efe0,{c:.6,d:.8}],['Luva Mola',0,0x7ed957,{j:1.7,dj:1}],['Luva Relâmpago',0,0xffe14d,{s:1.4,c:.85}],
 ['Luva Tartaruga',0,0x3f8f5f,{df:.55,s:.8}],['Luva Elástica',0,0xff8fd1,{r:1.9}],['Luva Coração',0,0xff4f7b,{reg:4}],['Luva Martelo',0,0x6b4f3a,{k:2.4,d:1.15}],
@@ -380,7 +381,9 @@ const PU=[
 ['Luva Tubarão Branco',2,0xb8c8d0,{life:.3,dash:1,d:1.25}],['Luva Nuvem',2,0xffffff,{inv:1,j:2,dj:1}],['Luva Planeta',2,0x6a5acd,{mag:1,wave:1,gi:1}],['Luva Samurai',2,0xb5182a,{crit:.4,c:.75}],
 ['Luva Aurora',2,0x7affc8,{frz:1,burn:1,reg:4}],['Luva Meteoro de Fogo',2,0xff3a1a,{rkt:1,wave:1,burn:1}],
 ['Luva do Dragão Dourado',3,0xffc000,{d:1.5,burn:1,wave:1,rkt:1,df:.8}],['Luva do Rei Leão',3,0xe8a000,{d:1.7,k:1.6,s:1.2,sh:50}],['Luva Cósmica',3,0x2a0a5a,{chain:1,multi:1,rkt:1,inv:1}],
-['Luva do Trovão Eterno',3,0xfff27a,{chain:1,stun:.5,s:1.25,crit:.25}],['Luva Arco-íris Lendária',3,0xff66cc,{burn:1,frz:1,poi:1,life:.3,reg:4,crit:.3}]];
+['Luva do Trovão Eterno',3,0xfff27a,{chain:1,stun:.5,s:1.25,crit:.25}],['Luva Arco-íris Lendária',3,0xff66cc,{burn:1,frz:1,poi:1,life:.3,reg:4,crit:.3}],
+['Luva Suprema',4,0xff2a9d,{d:1.8,s:1.3,c:.65,df:.6,reg:5,crit:.3,life:.3,chain:1,wave:1,rkt:1,burn:1,sh:60}]];
+const SUPREMA=PU.length-1;
 function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  if(m.d>1)o.push('+'+pc(m.d)+' de força');if(m.d<1)o.push('-'+pc(m.d)+' de força');if(m.s>1)o.push('corre mais');if(m.s<1)o.push('anda mais devagar');
  if(m.c<1)o.push('socos mais rápidos');if(m.c>1)o.push('socos mais lentos');if(m.k>1)o.push('empurrão forte');if(m.r>1)o.push('braço comprido');
@@ -393,7 +396,7 @@ function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  return o.join(' · ')}
 let album=LS.get('luvas_album',[]);if(!Array.isArray(album))album=[];
 let eq=LS.get('luvas_eq',-1);if(!(eq>=0&&album.includes(eq)))eq=-1;
-const PRICE=[10,20,50,100],KO_COINS=1000;let kos=+LS.get('luvas_kos',0)||0,matchKos=0;if(!LS.get('luvas_coins',0)){kos*=KO_COINS;LS.set('luvas_kos',kos);LS.set('luvas_coins',1)}
+const PRICE=[10,20,50,100,0],KO_COINS=10;let kos=+LS.get('luvas_kos',0)||0,matchKos=0;if(!LS.get('luvas_coins',0)){kos*=KO_COINS;LS.set('luvas_kos',kos);LS.set('luvas_coins',1)}
 const albBtn=()=>$('#albb').textContent=`Loja de luvas · ${kos} moedas`;
 function addKo(){kos+=KO_COINS;matchKos+=KO_COINS;LS.set('luvas_kos',kos);albBtn()}
 function defGlove(p){if(p.human&&p.pu<0&&eq>=0&&album.includes(eq)){p.pu=eq;p.puT=Infinity}}
@@ -447,7 +450,8 @@ function patternTex(k){if(patCache[k])return patCache[k];const pu=PU[k],cv=docum
  const diamonds=col=>{g.strokeStyle=col;g.lineWidth=2;for(let x=-128;x<256;x+=16){g.beginPath();g.moveTo(x,0);g.lineTo(x+128,128);g.stroke();g.beginPath();g.moveTo(x+128,0);g.lineTo(x,128);g.stroke()}};
  const hexes=col=>{g.strokeStyle=col;g.lineWidth=3;for(let y=0;y<140;y+=26)for(let x=(y/26)%2?15:0;x<270;x+=30){g.beginPath();for(let j=0;j<6;j++){const a=j*PI/3;g.lineTo(x+Math.cos(a)*14,y+Math.sin(a)*14)}g.closePath();g.stroke()}};
  const has=w=>w.some(s=>n.includes(s));
- if(has(['Panda'])){g.fillStyle='#f4f4f4';g.fillRect(0,0,256,128);dots('#222',14,9)}
+ if(has(['Suprema'])){bands(['#ff4f4f','#ff9a3c','#ffe14d','#4fd36f','#4fa3ff','#a45cff'],22);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,0,256,128);stars('#fff6b0',20);g.fillStyle='#ffd34d';g.fillRect(0,100,256,12)}
+ else if(has(['Panda'])){g.fillStyle='#f4f4f4';g.fillRect(0,0,256,128);dots('#222',14,9)}
  else if(has(['Abelha','Pirata','Escorpião'])){for(let x=0;x<256;x+=36){g.fillStyle='#222';g.fillRect(0,(x/36)*18%128,256,9)}}
  else if(has(['Arco-íris'])){bands(['#ff4f4f','#ff9a3c','#ffe14d','#4fd36f','#4fa3ff','#a45cff'],22)}
  else if(has(['Galáxia','Cósmica','Planeta','Aurora'])){g.fillStyle='#120a2a';g.fillRect(0,0,256,128);const r2=g.createRadialGradient(128,64,5,128,64,120);r2.addColorStop(0,C);r2.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r2;g.fillRect(0,0,256,128);stars('#fff',22)}
@@ -469,7 +473,7 @@ function patternTex(k){if(patCache[k])return patCache[k];const pu=PU[k],cv=docum
 const decoMats={},dM=(c,basic,o)=>{const key=c+'_'+(basic?1:0)+(o?'o':'');return decoMats[key]||(decoMats[key]=basic?new THREE.MeshBasicMaterial(Object.assign({color:c},o||{})):TM(c,o))};
 const octG=new THREE.OctahedronGeometry(1),auraTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');if(g){const r=g.createRadialGradient(32,32,2,32,32,32);if(r){r.addColorStop(0,'rgba(255,255,255,.9)');r.addColorStop(.4,'rgba(255,255,255,.35)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64)}}return new THREE.CanvasTexture(c)})();
 function decorateGlove(g,k,om){const U=g.userData,d=U.deco;if(!d)return;while(d.children.length)d.remove(d.children[0]);const pu=k>=0?PU[k]:null,side=U.side;
- U.bandM.color.setHex(pu?[0xffffff,0xdfe8ff,0xd9c2ff,0xffd34d][pu[1]]:0xffffff);U.strapM.color.setHex(pu?shade(pu[2],.45):0x2b2f3a);
+ U.bandM.color.setHex(pu?[0xffffff,0xdfe8ff,0xd9c2ff,0xffd34d,0xff66cc][pu[1]]:0xffffff);U.strapM.color.setHex(pu?shade(pu[2],.45):0x2b2f3a);
  if(pu){const m=pu[3],R=pu[1];
   const A=(geo,col,x,y,z,sx,sy,sz,rx=0,ry=0,rz=0,basic=false,olk=0)=>{const o=new THREE.Mesh(geo,dM(col,basic));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.rotation.set(rx,ry,rz);if(olk&&om)ol(o,om,olk);d.add(o);return o};
   if(m.burn)for(const [x,z,h] of [[0,.04,.26],[-.08,.12,.2],[.08,.12,.2],[0,.2,.16]]){A(coneU,0xff7b00,x,.2+h/2,z,.07,h,.07,-.35,0,0,true);A(coneU,0xffe14d,x,.18+h*.35,z-.01,.04,h*.6,.04,-.35,0,0,true)}
@@ -485,7 +489,7 @@ function decorateGlove(g,k,om){const U=g.userData,d=U.deco;if(!d)return;while(d.
   const bs=U.base||1.15;g.scale.setScalar(m.gi?bs*1.25:m.mi?bs*.85:bs);
   // emblema no dorso da mão (um só, pelo mais importante)
   const top=(y=.215)=>[0,y,.02];
-  if(R==3){for(let i=0;i<5;i++){const a=(i-2)*.35;A(coneU,0xffd34d,Math.sin(a)*.11,.25,.02+Math.cos(a)*.02-.02,.03,.09,.03,0,0,-a*.6,false,1.25)}A(octG,0xff3a6a,0,.22,.02,.045,.06,.045,0,.6,0,false,1.2);
+  if(R>=3){for(let i=0;i<5;i++){const a=(i-2)*.35;A(coneU,0xffd34d,Math.sin(a)*.11,.25,.02+Math.cos(a)*.02-.02,.03,.09,.03,0,0,-a*.6,false,1.25)}A(octG,0xff3a6a,0,.22,.02,.045,.06,.045,0,.6,0,false,1.2);
    const au=new THREE.Sprite(new THREE.SpriteMaterial({map:auraTex,color:pu[2],transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));au.scale.set(.85,.85,1);au.position.z=.04;d.add(au)}
   else if(m.reg){A(sphG,0xff3a5a,-.035,.215,0,.045,.045,.025,0,0,0,false,1.25);A(sphG,0xff3a5a,.035,.215,0,.045,.045,.025);A(coneU,0xff3a5a,0,.214,.05,.06,.07,.025,PI/2,0,0)}
   else if(m.crit)A(octG,0xffe14d,...top(.23),.06,.08,.06,0,.5,0,false,1.2);
@@ -1308,23 +1312,24 @@ function thumbPump(){if(!thR)return;for(let n=0;n<5&&thQ.length;n++){const k=thQ
 const thImg=k=>`<img data-th="${k}" alt="" ${thumbs[k]?`src="${thumbs[k]}"`:''}>`;
 let albF='all';
 function drawAlbum(){$('#kosv').textContent=kos+' moedas';
- $('#albs').textContent=`Cada nocaute que você dá em qualquer luta vale ${KO_COINS} moedas. Você tem ${album.length} de ${PU.length} luvas. Toque em "Usar" para lutar sempre com ela.`;
+ $('#albs').textContent=`Cada nocaute que você dá em qualquer luta vale ${KO_COINS} moedas. Você tem ${album.filter(i=>i!==SUPREMA).length} de ${PU.length-1} luvas. Tenha todas para ganhar a Luva Suprema!`;
  document.querySelectorAll('#albf button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===albF));
  const ok=i=>albF==='all'||(albF==='own'?album.includes(i):PU[i][1]===+albF);
  $('#albg').innerHTML=(albF==='all'||albF==='own'?`<div class="${eq<0?'eq':''}">${thImg(-1)}Luva vermelha<small>Normal, sem poderes</small>${eq<0?'<em>Usando</em>':'<button class="btn sm" data-k="-1">Usar</button>'}</div>`:'')+
   PU.map((u,i)=>{if(!ok(i))return'';const own=album.includes(i),pr=PRICE[u[1]];
    return`<div class="${eq===i?'eq':''}${own?'':' lock'}">${thImg(i)}${esc(u[0])}<small class="r${u[1]}">${RAR[u[1]]}</small><small>${esc(desc(u[3]))}</small>
-   ${own?(eq===i?'<em>Usando</em>':`<button class="btn sm" data-k="${i}">Usar</button>`):`<button class="btn sm pri" data-buy="${i}" ${kos<pr?'disabled':''}>Comprar · ${pr}</button>`}</div>`}).join('');queueThumbs()}
+   ${own?(eq===i?'<em>Usando</em>':`<button class="btn sm" data-k="${i}">Usar</button>`):i===SUPREMA?`<em class="sup">Prêmio: tenha as outras ${PU.length-1} luvas (${album.filter(j=>j!==SUPREMA).length}/${PU.length-1})</em>`:`<button class="btn sm pri" data-buy="${i}" ${kos<pr?'disabled':''}>Comprar · ${pr}</button>`}</div>`}).join('');queueThumbs()}
+function checkSuprema(){if(album.includes(SUPREMA)||!PU.every((u,i)=>i===SUPREMA||album.includes(i)))return false;album.push(SUPREMA);LS.set('luvas_album',album);return true}
 function queueThumbs(){thumbInit();thQ=[...document.querySelectorAll('#albg img[data-th]')].map(im=>+im.dataset.th).filter(k=>!thumbs[k]);thumbPump()}
 $('#albf').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;albF=b.dataset.f;drawAlbum()});
 $('#albg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
- if(b.dataset.buy!=null){const i=+b.dataset.buy,pr=PRICE[PU[i][1]];if(kos<pr||album.includes(i))return;kos-=pr;LS.set('luvas_kos',kos);album.push(i);LS.set('luvas_album',album);if(AC||true)try{snd(523,.12,'sine',.1)}catch(x){}}
+ if(b.dataset.buy!=null){const i=+b.dataset.buy,pr=PRICE[PU[i][1]];if(kos<pr||album.includes(i))return;kos-=pr;LS.set('luvas_kos',kos);album.push(i);LS.set('luvas_album',album);if(checkSuprema()){albF='all';setTimeout(()=>{const n=document.querySelector('#albs');if(n)n.textContent='PARABÉNS! Você tem todas as luvas e ganhou a LUVA SUPREMA! Toque em "Usar" nela.'},0);try{snd(523,.15,'sine',.1);setTimeout(()=>snd(659,.15,'sine',.1),150);setTimeout(()=>snd(784,.15,'sine',.1),300);setTimeout(()=>snd(1046,.3,'sine',.1),450)}catch(x){}}if(AC||true)try{snd(523,.12,'sine',.1)}catch(x){}}
  else if(b.dataset.k!=null){eq=+b.dataset.k;LS.set('luvas_eq',eq)}
  drawAlbum();albBtn()});
 $('#albb').onclick=()=>{drawAlbum();$('#album').classList.remove('hide')};
 $('#albx').onclick=()=>$('#album').classList.add('hide');
 $('#helpb').onclick=()=>$('#help').classList.remove('hide');$('#helpx').onclick=()=>$('#help').classList.add('hide');
-albBtn();modeUI();
+checkSuprema();albBtn();modeUI();
 /* ---------- personagem ---------- */
 let myLook=normLook(LS.get('luvas_look',null)||randLook(7)),lookOpen=false,lkTab='h',lkF='a',pvR=null,pvS=null,pvC=null,pvM=null,pvT=0;
 function pvBuild(){if(!pvS)return;if(pvM)pvS.remove(pvM);const p={bm:TM(0xe23b3b)},rig=boxer(p,myLook),gm=TM(0xe23b3b);
