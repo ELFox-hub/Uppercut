@@ -393,7 +393,7 @@ function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
  return o.join(' · ')}
 let album=LS.get('luvas_album',[]);if(!Array.isArray(album))album=[];
 let eq=LS.get('luvas_eq',-1);if(!(eq>=0&&album.includes(eq)))eq=-1;
-const PRICE=[10,20,50,100],KO_COINS=10;let kos=+LS.get('luvas_kos',0)||0,matchKos=0;if(!LS.get('luvas_coins',0)){kos*=KO_COINS;LS.set('luvas_kos',kos);LS.set('luvas_coins',1)}
+const PRICE=[10,20,50,100],KO_COINS=1000;let kos=+LS.get('luvas_kos',0)||0,matchKos=0;if(!LS.get('luvas_coins',0)){kos*=KO_COINS;LS.set('luvas_kos',kos);LS.set('luvas_coins',1)}
 const albBtn=()=>$('#albb').textContent=`Loja de luvas · ${kos} moedas`;
 function addKo(){kos+=KO_COINS;matchKos+=KO_COINS;LS.set('luvas_kos',kos);albBtn()}
 function defGlove(p){if(p.human&&p.pu<0&&eq>=0&&album.includes(eq)){p.pu=eq;p.puT=Infinity}}
