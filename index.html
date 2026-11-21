@@ -895,7 +895,7 @@ function givePU(p,k){const pu=PU[k];if(!pu)return;p.pu=k;p.puT=DUR[pu[1]];setMod
  if(pu[1]>=2)feed(p.name,pu[0],'pegou a')}
 
 /* ================= física ================= */
-function move(p,mx,mz,sprint,jump,dt){if(p.stun>0){mx=mz=0;jump=false}
+function move(p,mx,mz,sprint,jump,dt){if(p.stun>0||p.flurry){mx=mz=0;jump=false;sprint=false}
  const l=Math.hypot(mx,mz);if(l>1){mx/=l;mz/=l}p.spr=!!sprint&&l>.3&&!p.bl;
  let sp=(sprint&&!p.bl?10.5:7)*p.M.s;if(p.bl)sp*=.5;if(p.frz>0)sp*=.45;if(p.swim)sp*=sprint?.85:.6;else if(H(p.pos.x,p.pos.z)<WATER-.2)sp*=.75;
  const s=Math.sin(p.yaw),c=Math.cos(p.yaw);let dx=(-s*mz+c*mx)*sp*dt,dz=(-c*mz-s*mx)*sp*dt;const len=Math.hypot(dx,dz);
