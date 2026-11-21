@@ -9,6 +9,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script src="firebase-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <style>
 /* VOICE: brincalhão e enérgico, como um torneio de boxe de desenho animado ao ar livre
@@ -36,7 +37,7 @@ h1 span{color:var(--red)}
 .seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
 button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 input[type=range]{width:100%;accent-color:var(--blue);height:32px}
-input[type=text]{font:700 16px Nunito,sans-serif;min-height:44px;padding:8px 12px;border-radius:12px;border:2px solid var(--line);width:100%;background:#fff;color:var(--ink)}
+input[type=email],input[type=password],#acct textarea,input[type=text]{font:700 16px Nunito,sans-serif;min-height:44px;padding:8px 12px;border-radius:12px;border:2px solid var(--line);width:100%;background:#fff;color:var(--ink)}
 output{color:var(--blue);margin-left:6px}
 .big{display:block;width:100%;margin:18px 0 12px;font:400 26px 'Lilita One',sans-serif;min-height:58px;border:0;border-radius:16px;background:var(--red);color:#fff;cursor:pointer;box-shadow:0 6px 0 #a8232a}
 .big:active{transform:translateY(3px);box-shadow:0 3px 0 #a8232a}
@@ -72,6 +73,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 6px;bor
 .empty{font-size:14px;opacity:.7;margin:2px 0}
 .code{display:flex;gap:8px}.code input{flex:1}
 #onst{font-weight:800}
+#acct .card{width:min(620px,100%)}#acct h3{margin:16px 0 6px;font-size:17px}#acct .fl{display:grid;gap:8px;margin:8px 0}#acct textarea{min-height:64px;resize:vertical;font:600 13px ui-monospace,monospace;word-break:break-all}#acst{font-weight:800;margin:6px 0}#acst.err{color:#d23b3b}#acst.ok{color:#13924a}
 /* HUD */
 .vp{position:fixed;pointer-events:none;overflow:hidden;z-index:2;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.55)}
 .vp.b2{border-left:3px solid #fff}.vp.b2.st{border-left:0;border-top:3px solid #fff}
@@ -183,8 +185,8 @@ body.touch #mode button[data-v=duo]{display:none}
 <div id="rot"><b>Vire o celular</b>O jogo funciona com o celular deitado.</div>
 
 <div id="menu" class="ov"><div class="card mc">
-  <div class="mh"><div><h1>Upper<span>cut!</span></h1><p class="sub">Boxe em primeira pessoa num mapa aberto. Abra baús e colecione as 50 luvas especiais!</p></div>
-    <div class="mtop"><button class="btn pri" id="lookb">Personagem</button><button class="btn" id="albb">Coleção de luvas 0/50</button><button class="btn" id="helpb">Controles e combos</button></div></div>
+  <div class="mh"><div><h1>Upper<span>cut!</span></h1><p class="sub">Boxe em primeira pessoa num mapa aberto. Abra baús, ganhe moedas e colecione as 100 luvas!</p></div>
+    <div class="mtop"><button class="btn pri" id="lookb">Personagem</button><button class="btn" id="albb">Coleção de luvas 0/50</button><button class="btn" id="helpb">Controles e combos</button><button class="btn" id="accb">👤 Conta</button></div></div>
   <div class="mg">
     <div>
       <div class="lbl">Modo</div><div class="seg" id="mode"><button data-v="cpu" aria-pressed="true">Contra CPUs</button><button data-v="duo" aria-pressed="false">Amigo na mesma tela</button><button data-v="online" aria-pressed="false">Online com amigos</button></div>
@@ -231,6 +233,25 @@ body.touch #mode button[data-v=duo]{display:none}
   <h2>Controles e combos</h2>
   <div id="ctl" class="ctl"></div>
   <div class="acts"><button class="btn" id="helpx">Fechar</button></div>
+</div></div>
+
+<div id="acct" class="ov hide"><div class="card">
+  <h2>Conta</h2>
+  <p id="acst"></p>
+  <div id="acc-claude" class="hide"><p class="sub">Você está usando sua conta do Claude<b id="acnm"></b>. Suas luvas, moedas e personagem são salvos sozinhos e aparecem em qualquer aparelho onde você abrir este jogo no Claude.</p>
+   <div class="acts"><button class="btn pri" id="acsv1">Salvar agora</button></div></div>
+  <div id="acc-out" class="hide"><p class="sub">Entre com sua conta para salvar seu progresso na internet e jogar em qualquer aparelho.</p>
+   <div class="fl"><input type="email" id="acem" placeholder="E-mail" autocomplete="email" maxlength="80"><input type="password" id="acpw" placeholder="Senha (pelo menos 6 letras ou números)" autocomplete="current-password" maxlength="60"></div>
+   <div class="acts"><button class="btn pri" id="acin">Entrar</button><button class="btn" id="acnew">Criar conta</button><button class="btn" id="acfg">Esqueci a senha</button></div></div>
+  <div id="acc-in" class="hide"><p class="sub">Conectado como <b id="acmail"></b>. Seu progresso é salvo sozinho na internet.</p>
+   <div class="acts"><button class="btn pri" id="acsv2">Salvar agora</button><button class="btn" id="acout">Sair</button></div></div>
+  <div id="acc-none" class="hide"><p class="sub">As contas online ainda não foram ligadas neste site. Enquanto isso, use o código de salvamento abaixo para levar seu progresso para outro aparelho.</p></div>
+  <h3>Código de salvamento</h3>
+  <p class="sub">Gere um código aqui e cole no outro aparelho. Suas luvas nunca são apagadas: o código só adiciona.</p>
+  <div class="acts"><button class="btn" id="acgen">Gerar meu código</button><button class="btn hide" id="accp">Copiar</button></div>
+  <textarea id="acout_code" class="hide" readonly></textarea>
+  <textarea id="acin_code" placeholder="Cole aqui um código de salvamento"></textarea>
+  <div class="acts" style="margin-top:8px"><button class="btn" id="acload">Carregar código</button><button class="btn" id="accx">Fechar</button></div>
 </div></div>
 
 <div id="album" class="ov hide"><div class="card wide">
@@ -401,7 +422,7 @@ function desc(m){const o=[],pc=v=>Math.round(Math.abs(v-1)*100)+'%';
 let album=LS.get('luvas_album',[]);if(!Array.isArray(album))album=[];
 let eq=LS.get('luvas_eq',-1);if(!(eq>=0&&album.includes(eq)))eq=-1;
 const PRICE=[10,20,50,100,0],KO_COINS=1;let kos=+LS.get('luvas_kos',0)||0,matchKos=0;if(!LS.get('luvas_coins',0)){kos*=KO_COINS;LS.set('luvas_kos',kos);LS.set('luvas_coins',1)}
-const albBtn=()=>$('#albb').textContent=`Loja de luvas · ${kos} moedas`;
+const albBtn=()=>{const b=$('#albb');if(b)b.textContent=`Loja de luvas · ${kos} ${kos==1?'moeda':'moedas'}`};
 function addKo(){kos+=KO_COINS;matchKos+=KO_COINS;LS.set('luvas_kos',kos);albBtn()}
 function defGlove(p){if(p.human&&p.pu<0&&eq>=0&&album.includes(eq)){p.pu=eq;p.puT=Infinity}else if(p.kind=='bot'&&p.pu<0&&p.cg>=0){p.pu=p.cg;p.puT=Infinity}}
 const CPU_RAR={facil:[0],normal:[1],dificil:[2,3]};
@@ -1379,6 +1400,62 @@ $('#albg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
 $('#albb').onclick=()=>{drawAlbum();$('#album').classList.remove('hide')};
 $('#albx').onclick=()=>$('#album').classList.add('hide');
 $('#helpb').onclick=()=>$('#help').classList.remove('hide');$('#helpx').onclick=()=>$('#help').classList.add('hide');
+// ===== Contas e salvamento =====
+const CONTA={mode:null,uid:null,name:'',db:null,fb:null,t:+LS.get('luvas_t',0)||0,applying:false,timer:0,outArm:0};
+const SAVEK=['luvas_kos','luvas_album','luvas_eq','luvas_look','luvas_nick','luvas_supl'];
+{const o=LS.set;LS.set=function(k,v){o.call(LS,k,v);if(SAVEK.includes(k)&&!CONTA.applying){CONTA.t=Date.now();o.call(LS,'luvas_t',CONTA.t);cloudSoon()}}}
+function snapSave(){return{v:1,t:CONTA.t,kos,album:[...album],eq,look:myLook,nick:($('#nick').value||'').trim().slice(0,16),supl:LS.get('luvas_supl',0)?1:0}}
+function applySave(s,force){if(!s||typeof s!=='object')return false;CONTA.applying=true;
+ const al=Array.isArray(s.album)?s.album.filter(i=>Number.isInteger(i)&&i>=0&&i<PU.length):[];album=[...new Set([...album,...al])];
+ const st=+s.t||0;if(force||st>CONTA.t){if(Number.isFinite(+s.kos))kos=Math.max(0,Math.floor(+s.kos));if(Number.isInteger(s.eq))eq=s.eq;if(s.look&&typeof s.look=='object')myLook=normLook(s.look);
+  if(typeof s.nick=='string'&&s.nick.trim())$('#nick').value=s.nick.trim().slice(0,16);if(s.supl)LS.set('luvas_supl',1);CONTA.t=force?Date.now():st}
+ if(!(eq>=0&&album.includes(eq)))eq=-1;checkSuprema();
+ LS.set('luvas_album',album);LS.set('luvas_kos',kos);LS.set('luvas_eq',eq);LS.set('luvas_look',myLook);LS.set('luvas_nick',($('#nick').value||'').trim());LS.set('luvas_t',CONTA.t);
+ CONTA.applying=false;albBtn();return true}
+function clearLocal(){CONTA.applying=true;album=[];kos=0;eq=-1;myLook=normLook(randLook(Math.floor(Math.random()*1e6)));$('#nick').value='';
+ LS.set('luvas_album',album);LS.set('luvas_kos',0);LS.set('luvas_eq',-1);LS.set('luvas_look',myLook);LS.set('luvas_nick','');LS.set('luvas_supl',0);CONTA.t=0;LS.set('luvas_t',0);CONTA.applying=false;albBtn()}
+async function cloudGet(){if(CONTA.mode=='claude'&&CONTA.uid){const sn=await CONTA.db.doc('data/users/'+CONTA.uid+'/save').get();return sn.exists?sn.data():null}
+ if(CONTA.mode=='fb'&&CONTA.uid){const sn=await CONTA.fb.fs.collection('saves').doc(CONTA.uid).get();return sn.exists?sn.data():null}return null}
+async function cloudSave(){clearTimeout(CONTA.timer);if(!CONTA.uid)return false;const sv=snapSave(),o={s:JSON.stringify(sv),t:sv.t};
+ if(CONTA.mode=='claude')await CONTA.db.doc('data/users/'+CONTA.uid+'/save').set(o);else if(CONTA.mode=='fb')await CONTA.fb.fs.collection('saves').doc(CONTA.uid).set(o);else return false;return true}
+function cloudSoon(){if(!CONTA.uid)return;clearTimeout(CONTA.timer);CONTA.timer=setTimeout(()=>cloudSave().catch(()=>{}),2500)}
+async function cloudLoad(){try{const d=await cloudGet();if(d&&typeof d.s=='string'){try{applySave(JSON.parse(d.s))}catch(e){}}await cloudSave();accMsg('Progresso sincronizado!','ok')}catch(e){accMsg('Não deu para falar com o servidor agora. Seu progresso continua salvo neste aparelho.','err')}}
+function accMsg(t,c){const e=$('#acst');e.textContent=t||'';e.className=c||''}
+function accUI(){const m=CONTA.mode,show=(id,on)=>$(id).classList.toggle('hide',!on);
+ show('#acc-claude',m=='claude');show('#acc-out',m=='fb'&&!CONTA.uid);show('#acc-in',m=='fb'&&!!CONTA.uid);show('#acc-none',!m);
+ $('#acnm').textContent=CONTA.name?' ('+CONTA.name+')':'';$('#acmail').textContent=CONTA.name||'';
+ $('#accb').textContent=CONTA.uid?'👤 Conta ✓':'👤 Conta';$('#acout').textContent='Sair'}
+function loadJs(u){return new Promise((ok,no)=>{const e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=no;document.head.appendChild(e)})}
+const FBERR={'auth/invalid-email':'Esse e-mail não parece certo.','auth/email-already-in-use':'Já existe uma conta com esse e-mail. Clique em Entrar.','auth/weak-password':'A senha precisa ter pelo menos 6 letras ou números.',
+ 'auth/invalid-credential':'E-mail ou senha errados.','auth/wrong-password':'E-mail ou senha errados.','auth/user-not-found':'Não existe conta com esse e-mail. Clique em Criar conta.','auth/missing-password':'Digite a senha.',
+ 'auth/too-many-requests':'Muitas tentativas. Espere um pouco e tente de novo.','auth/network-request-failed':'Sem internet agora. Tente de novo.','auth/unauthorized-domain':'Este site ainda não foi autorizado nas contas (veja o README).'};
+const fbErr=e=>FBERR[e&&e.code]||'Algo deu errado. Tente de novo.';
+async function fbInit(){const cfg=window.UPPERCUT_FIREBASE;if(!cfg||!cfg.apiKey||/COLE|PASTE/i.test(cfg.apiKey))return false;
+ try{const V='https://www.gstatic.com/firebasejs/10.12.2/';await loadJs(V+'firebase-app-compat.js');await Promise.all([loadJs(V+'firebase-auth-compat.js'),loadJs(V+'firebase-firestore-compat.js')]);
+  if(!firebase.apps.length)firebase.initializeApp(cfg);CONTA.fb={auth:firebase.auth(),fs:firebase.firestore()};
+  CONTA.fb.auth.onAuthStateChanged(async u=>{CONTA.uid=u?u.uid:null;CONTA.name=u?u.email:'';accUI();if(u)await cloudLoad();accUI()});return true}catch(e){return false}}
+async function accInit(){
+ if(window.claude&&claude.use){try{const [u,db]=await Promise.all([claude.use('user'),claude.use('db')]);if(u&&db){CONTA.mode='claude';CONTA.db=db;CONTA.uid=await u.id();try{CONTA.name=(await u.name())||''}catch(e){}accUI();if(CONTA.uid)await cloudLoad()}}catch(e){}}
+ else if(await fbInit())CONTA.mode='fb';accUI()}
+$('#accb').onclick=()=>{accMsg('');$('#acct').classList.remove('hide')};
+$('#accx').onclick=()=>$('#acct').classList.add('hide');
+const busy=(b,f)=>async()=>{const el=$(b);if(el.disabled)return;el.disabled=true;try{await f()}finally{el.disabled=false}};
+const saveNow=async()=>{try{await cloudSave();accMsg('Salvo na sua conta!','ok')}catch(e){accMsg('Não deu para salvar agora. Tente de novo daqui a pouco.','err')}};
+$('#acsv1').onclick=busy('#acsv1',saveNow);$('#acsv2').onclick=busy('#acsv2',saveNow);
+const cred=()=>[$('#acem').value.trim(),$('#acpw').value];
+$('#acin').onclick=busy('#acin',async()=>{const [e,p]=cred();accMsg('Entrando…');try{await CONTA.fb.auth.signInWithEmailAndPassword(e,p);$('#acpw').value='';accMsg('Bem-vindo de volta!','ok')}catch(x){accMsg(fbErr(x),'err')}});
+$('#acnew').onclick=busy('#acnew',async()=>{const [e,p]=cred();accMsg('Criando sua conta…');try{await CONTA.fb.auth.createUserWithEmailAndPassword(e,p);$('#acpw').value='';accMsg('Conta criada! Seu progresso deste aparelho foi salvo nela.','ok')}catch(x){accMsg(fbErr(x),'err')}});
+$('#acfg').onclick=busy('#acfg',async()=>{const [e]=cred();if(!e){accMsg('Digite seu e-mail primeiro.','err');return}try{await CONTA.fb.auth.sendPasswordResetEmail(e);accMsg('Mandamos um e-mail para você trocar a senha.','ok')}catch(x){accMsg(fbErr(x),'err')}});
+$('#acout').onclick=busy('#acout',async()=>{if(Date.now()-CONTA.outArm>4000){CONTA.outArm=Date.now();$('#acout').textContent='Clique de novo para sair';accMsg('Ao sair, este aparelho volta para um jogador novo. Seu progresso fica guardado na conta.');return}
+ try{await cloudSave()}catch(e){accMsg('Não deu para salvar antes de sair. Verifique a internet e tente de novo.','err');$('#acout').textContent='Sair';return}
+ await CONTA.fb.auth.signOut();clearLocal();accMsg('Você saiu. Seu progresso está guardado na sua conta.','ok');accUI()});
+const b64e=t=>btoa(unescape(encodeURIComponent(t))),b64d=t=>decodeURIComponent(escape(atob(t)));
+$('#acgen').onclick=()=>{const c='UPC1-'+b64e(JSON.stringify(snapSave())),o=$('#acout_code');o.value=c;o.classList.remove('hide');$('#accp').classList.remove('hide');o.select();accMsg('Código pronto! Copie e cole no outro aparelho.','ok')};
+$('#accp').onclick=async()=>{const o=$('#acout_code');try{await navigator.clipboard.writeText(o.value);accMsg('Código copiado!','ok')}catch(e){o.select();accMsg('Selecionei o código: copie com Ctrl+C.','ok')}};
+$('#acload').onclick=()=>{const t=$('#acin_code').value.trim().replace(/\s+/g,'');if(!t.startsWith('UPC1-')){accMsg('Esse código não é do Uppercut!','err');return}
+ let s;try{s=JSON.parse(b64d(t.slice(5)))}catch(e){accMsg('Esse código está incompleto. Copie ele inteiro de novo.','err');return}
+ const n0=album.length;applySave(s,true);$('#acin_code').value='';accMsg(`Código carregado! Você agora tem ${album.length} luvas (${album.length-n0} novas) e ${kos} ${kos==1?'moeda':'moedas'}.`,'ok')};
+accInit();
 checkSuprema();albBtn();modeUI();
 /* ---------- personagem ---------- */
 let myLook=normLook(LS.get('luvas_look',null)||randLook(7));

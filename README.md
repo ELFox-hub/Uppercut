@@ -96,10 +96,45 @@ Quando o jogo é aberto dentro do Claude, o modo online usa as salas do Claude, 
 
 A coleção de luvas, a luva padrão, o apelido e o último mapa escolhido ficam salvos no navegador (localStorage).
 
+## Contas e salvamento
+
+No menu, clique em **👤 Conta**.
+
+- **Código de salvamento:** clique em *Gerar meu código*, copie e cole no outro aparelho em *Carregar código*. Funciona sempre, sem configurar nada. O código só adiciona luvas, nunca apaga.
+- **Contas online (e-mail e senha):** guardam o progresso na internet e funcionam em qualquer aparelho. Para ligar, siga os passos abaixo uma vez só.
+
+### Como ligar as contas online (Firebase, grátis)
+
+1. Entre em **console.firebase.google.com** com sua conta Google e clique em **Criar projeto** (pode chamar de `uppercut`). O Google Analytics pode ficar desligado.
+2. No menu da esquerda, abra **Criação > Authentication**, clique em **Vamos começar**, escolha **E-mail/senha**, ative e salve.
+3. Ainda em Authentication, abra **Configurações > Domínios autorizados** e adicione `elfox-hub.github.io`.
+4. Abra **Criação > Firestore Database**, clique em **Criar banco de dados**, escolha um local (ex.: `southamerica-east1`) e o **modo de produção**.
+5. Na aba **Regras** do Firestore, apague tudo, cole isto e clique em **Publicar**:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /saves/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
+```
+
+6. Clique na engrenagem **⚙ > Configurações do projeto**, desça até **Seus apps** e clique no ícone **</>** (Web). Dê um nome, registre e copie os valores de `firebaseConfig`.
+7. No GitHub, abra o arquivo **firebase-config.js**, clique no lápis ✏️ e troque cada `COLE_AQUI` pelo valor correspondente. Clique em **Commit changes**.
+8. Espere uns minutos, abra o jogo e aperte **Ctrl+Shift+R**. Em **👤 Conta** vão aparecer os campos de e-mail e senha.
+
+Os valores do `firebase-config.js` não são senha: pode deixar no GitHub. Quem protege as contas são as regras do passo 5.
+
+Jogando dentro do Claude, a conta é a do próprio Claude e o salvamento é automático.
+
 ## Arquivos
 
 - `index.html`: o jogo inteiro (HTML, CSS e JavaScript num arquivo só)
 - `manifest.webmanifest`, `sw.js`, `icon-192.png`, `icon-512.png`: arquivos que deixam o jogo instalável como aplicativo
+- `firebase-config.js`: configuração das contas online (veja "Contas e salvamento")
 - `screenshot.png`: imagem do jogo usada neste README
 
 O Three.js (versão r128), o PeerJS (versão 1.5.4) e as fontes (Lilita One e Nunito) são carregados pela internet na primeira vez que o jogo é aberto. O modo online precisa de internet sempre.

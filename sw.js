@@ -1,11 +1,12 @@
 // Guarda o jogo no aparelho para abrir rápido e funcionar sem internet depois da primeira vez.
-const CACHE = 'uppercut-v17';
+const CACHE = 'uppercut-v18';
 const FILES = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
+  './firebase-config.js',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'
 ];
@@ -25,6 +26,8 @@ self.addEventListener('activate', e => {
 // Primeiro tenta a internet (para pegar atualizações); sem internet, usa a cópia guardada.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // Contas online (Firebase) e outros sites passam direto, sem guardar cópia.
+  if (new URL(e.request.url).origin !== location.origin && !FILES.includes(e.request.url)) return;
   e.respondWith(
     fetch(e.request)
       .then(r => {
