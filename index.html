@@ -756,11 +756,11 @@ function spawn(p){let bx=0,bz=0,bd=-Infinity;const others=P.filter(o=>o!==p&&o.s
  for(let k=0;k<120;k++){let x,z;if(BIG&&others.length&&k<80){const b=others[Math.floor(Math.random()*others.length)],a=Math.random()*2*PI,d=35+Math.random()*55;x=b.pos.x+Math.cos(a)*d;z=b.pos.z+Math.sin(a)*d}else{x=(Math.random()*2-1)*E;z=(Math.random()*2-1)*E}
   if(Math.abs(x)>E||Math.abs(z)>E||H(x,z)<WATER+.4||!clearAt(x,z,1.2))continue;if(p.kind=='bot'&&k<100&&crowd(x,z,p,15)>=5)continue;
   let md=1e9;for(const o of others)md=Math.min(md,Math.hypot(o.pos.x-x,o.pos.z-z));const sc=BIG?-Math.abs(Math.min(md,1e4)-55):md;if(sc>bd){bd=sc;bx=x;bz=z}}
- Object.assign(p,{vy:0,vx:0,vz:0,hp:100,sh:0,dead:false,sp:true,inv:1.5,yaw:Math.atan2(bx,bz),pitch:0,goal:null,stuck:0,alert:null,stun:0,frz:0,burn:0,poi:0,pend:null,multi:null,pu:-1,slam:false,spinA:null,whirl:null,swim:false,leapT:0,flurry:null,ch:0,chT:0,cntT:0,ca:null});
+ Object.assign(p,{vy:0,vx:0,vz:0,hp:100,sh:0,dead:false,sp:true,inv:1.5,yaw:Math.atan2(bx,bz),pitch:0,goal:null,stuck:0,alert:null,stun:0,frz:0,burn:0,poi:0,pend:null,multi:null,pu:-1,slam:false,spinA:null,whirl:null,fly:null,swim:false,leapT:0,flurry:null,ch:0,chT:0,cntT:0,ca:null});
  defGlove(p);setMods(p);if(p.pu>=0&&PU[p.pu][3].sh)p.sh=PU[p.pu][3].sh;p.pos.set(bx,H(bx,bz),bz);p.grp.visible=true;if(p.hud)p.hud.dead.classList.add('hide')}
 
 /* ================= combate ================= */
-function punch(p,strong){if(p.dead||p.cd>0||p.stun>0||p.pend||p.flurry||p.spinA)return;const m=p.M;
+function punch(p,strong){if(p.dead||p.cd>0||p.stun>0||p.pend||p.flurry||p.spinA||p.fly)return;const m=p.M;
  p.cd=(strong?.85:.34)*m.c*(p.kind=='bot'?D().pc:1);p.ph=strong?1:(p.ph^1);p.pS=strong?1:0;p.pnD=strong?.42:.24;p.pnT=p.pnD;p.pn++;
  const now=performance.now()/1000;if(!p.seq||(p.seq.length&&now-p.seq[p.seq.length-1]>1.1))p.seq=[];p.seq.push(now);p.sq=((p.sq||'')+(strong?'F':'J')).slice(-4);if(p.seq.length==1)p.sq=strong?'F':'J';if(p.seq.length>4)p.seq.shift();
  let cb=null;const sq=p.sq;
@@ -769,7 +769,8 @@ function punch(p,strong){if(p.dead||p.cd>0||p.stun>0||p.pend||p.flurry||p.spinA)
  else if(sq.endsWith('JFJF'))cb='furacao';else if(sq.endsWith('JJJJ'))cb='metra';else if(sq.endsWith('JJF'))cb='gancho';else if(sq.endsWith('FF'))cb='martelo';
  if(cb){p.seq=[];p.sq='';p.cntT=0;comboFx(p,cb)}
  if(cb=='meteoro'||cb=='golfinho'){p.pend=null;p.vy=-18;p.slam=cb}else p.pend={t:strong?.26:.08,strong,cb};
- if(cb=='voador'||cb=='tubarao'){const f=fw(p),k=cb=='tubarao'?20:16;p.vx+=f[0]*k;p.vz+=f[1]*k}
+ if(cb=='voador'&&p.pu===SUPREMA){p.fly={t:0,next:0,hit:{}};p.vy=0;p.vx=p.vz=0}
+ else if(cb=='voador'||cb=='tubarao'){const f=fw(p),k=cb=='tubarao'?20:16;p.vx+=f[0]*k;p.vz+=f[1]*k}
  if(m.dash){const f=fw(p);p.vx+=f[0]*8;p.vz+=f[1]*8}
  const d=p.human?0:near(p);if(d<25)snd(strong?260:380,.12,'triangle',.05*(1-d/25),strong?90:160)}
 const CB={gancho:['Gancho Duplo','soco, soco, forte','o forte dobra de força e joga para o alto'],metra:['Metralhadora','4 socos seguidos','socos relâmpago enquanto você segurar o soco (até 4 s), e o adversário fica atordoado até acabar'],
@@ -798,12 +799,57 @@ function supWall(p){let w=p.sw;const on=p.human&&p.cam&&!p.dead&&p.flurry&&p.pu=
    Object.assign(g.userData,{bx:(c-4.5)*.66+(r%2?.2:-.2),by:(r-2)*.6-.15,ph:Math.random()*6.28,sp:13+Math.random()*7});g.scale.setScalar(1);g.rotation.set(.35,(c-4.5)*-.09,0);w.add(g)}
   w.traverse(q=>q.layers.set(1+p.k));p.cam.add(w)}
  w.visible=true;const tt=performance.now()/1000;for(const g of w.children){const u=g.userData,k=Math.abs(Math.sin(tt*u.sp+u.ph));g.position.set(u.bx,u.by,-2.4-k*1.6)}}
+/* ===== combos Supremos especiais ===== */
+const SFX=[],METS=[],gGM=()=>dM(0xffffff,false,{emissive:0x1a2230});
+function giantGlove(kind,x,y,z){const g=gloveMesh(gGM(),1,0x13161f);g.scale.setScalar(5.5);g.rotation.x=kind?-PI/2:PI/2;g.position.set(x,kind?y+18:y-5,z);S.add(g);SFX.push({g,kind,t:0,x,y,z});
+ if(near({pos:new V3(x,y,z)})<40)snd(kind?120:300,.3,'triangle',.08,kind?60:600)}
+function addMeteor(o,x,z,delay,water){const m=new THREE.Mesh(sphG,dM(water?0x7fd4ff:0xbfe0ff,true));m.scale.setScalar(.9);const y0=H(x,z);m.position.set(x,y0+22,z);m.visible=false;S.add(m);METS.push({o,m,x,z,y0,delay,water,vy:-34})}
+function meteorRain(p,water){const pts=[];for(let i=0;i<9;i++){const a=i/9*2*PI+Math.random()*.4,r=4+Math.random()*6;pts.push(r2(p.pos.x+Math.sin(a)*r),r2(p.pos.z+Math.cos(a)*r))}
+ for(let j=0;j<pts.length;j+=2)addMeteor(p,pts[j],pts[j+1],j*.06,water);netPush(['M',water?1:0,...pts],p)}
+function supStrike(p,cb,best,dmg){const x=best.pos.x,y=best.pos.y,z=best.pos.z;
+ if(cb=='gancho'||cb=='martelo'){const k=cb=='martelo'?1:0;giantGlove(k,x,y,z);netPush(['G',k,r2(x),r2(y),r2(z)],p);
+  for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-x,ez=o.pos.z-z,el=Math.hypot(ex,ez)||.01;if(el>5.5)continue;deliver(o,p,{d:dmg*.6,kx:ex/el*(k?14:4),kz:ez/el*(k?14:4),f:k?16|4:16|128,st:.6});regHit(p)}}
+ if(cb=='contra'){ring(p.pos.x,p.pos.z,0xffffff,2.2);setTimeout(()=>ring(p.pos.x,p.pos.z,0x2f86ff,1.6),110);burst(p.pos.clone().setY(p.pos.y+1.2),0x2f86ff,30,10);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);
+  for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez)||.01;if(el>8)continue;deliver(o,p,{d:dmg*.4,kx:ex/el*16,kz:ez/el*16,f:16|4,st:.7});regHit(p)}}}
+function supFxStep(dt){
+ for(let i=SFX.length-1;i>=0;i--){const f=SFX[i];f.t+=dt;const g=f.g;
+  if(f.kind){const u=Math.min(1,f.t/.32);g.position.y=f.y+18-(18-2.6)*u*u;if(f.t>=.32&&!f.hit){f.hit=1;ring(f.x,f.z,0xffffff,2.4);burst(new V3(f.x,f.y+.5,f.z),0xd9c9a0,26,10);burst(new V3(f.x,f.y+1,f.z),0x2f86ff,18,8);if(near({pos:new V3(f.x,f.y,f.z)})<40)snd(70,.4,'sine',.25,35)}}
+  else{const u=Math.min(1,f.t/.4);g.position.y=f.y-5+(5+4)*(1-(1-u)*(1-u));if(f.t<.3)burst(new V3(f.x,f.y+.3,f.z),0xd9c9a0,3,5)}
+  if(f.t>.6)g.scale.setScalar(5.5*Math.max(.01,1-(f.t-.6)/.35));if(f.t>=.95){S.remove(g);SFX.splice(i,1)}}
+ for(let i=METS.length-1;i>=0;i--){const m=METS[i];if(m.delay>0){m.delay-=dt;continue}m.m.visible=true;m.m.position.y+=m.vy*dt;m.m.rotation.x+=dt*8;
+  if(Math.random()<.6)burst(m.m.position.clone(),m.water?0xbfeaff:0x2f86ff,1,2);
+  if(m.m.position.y<=m.y0+.3){ring(m.x,m.z,m.water?0x4fc3ff:0xffffff,1.1);burst(new V3(m.x,m.y0+.5,m.z),m.water?0xbfeaff:0xffffff,16,8);burst(new V3(m.x,m.y0+.5,m.z),0x2f86ff,8,6);
+   if(near({pos:m.m.position})<35)snd(90,.25,'sine',.12,40);
+   if(m.o&&!m.o.dead)for(const o of P){if(o===m.o||o.dead)continue;const ex=o.pos.x-m.x,ez=o.pos.z-m.z,el=Math.hypot(ex,ez)||.01;if(el<3.4&&Math.abs(o.pos.y-m.y0)<3){deliver(o,m.o,{d:16,kx:ex/el*12,kz:ez/el*12,f:16|128,st:.5});regHit(m.o)}}
+   S.remove(m.m);METS.splice(i,1)}}}
+function flyMove(p,dt){const f=p.fly;f.t+=dt;const cp=Math.cos(p.pitch),dx=-Math.sin(p.yaw)*cp,dy=Math.sin(p.pitch),dz=-Math.cos(p.yaw)*cp,sp=24*p.M.s;
+ p.pos.x=clamp(p.pos.x+dx*sp*dt,-LIM,LIM);p.pos.z=clamp(p.pos.z+dz*sp*dt,-LIM,LIM);p.pos.y=Math.min(p.pos.y+dy*sp*dt,70);
+ const g=H(p.pos.x,p.pos.z);if(p.pos.y<g){p.pos.y=g}p.vy=0;p.vx=p.vz=0;p.gr=p.pos.y<=g+.05;p.swim=false;p.spr=true;
+ f.fx=(f.fx||0)-dt;if(f.fx<=0){f.fx=.04;const q=p.pos.clone().setY(p.pos.y+1*p.scl);burst(q,0xffffff,2,2);burst(q,0x2f86ff,1,2)}
+ f.next-=dt;if(f.next<=0){f.next=.12;let n=0;const now=f.t;
+  for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ey=(o.pos.y+.9*o.scl)-(p.pos.y+.9*p.scl),ez=o.pos.z-p.pos.z;if(ex*ex+ey*ey+ez*ez>(2.8*p.scl+.4*o.scl)**2)continue;
+   if(f.hit[o.id]&&now-f.hit[o.id]<.5)continue;f.hit[o.id]=now;deliver(o,p,{d:20*p.M.d*bon(p),kx:dx*14,kz:dz*14,f:16|128,st:.5});regHit(p);n++;burst(o.pos.clone().setY(o.pos.y+1.2*o.scl),0x2f86ff,10,7)}
+  for(const c of chests)if(Math.hypot(c.x-p.pos.x,c.z-p.pos.z)<2.8&&Math.abs(c.y-p.pos.y)<2.5)hitChest(c,1,p);
+  if(n){sfxHit(p,true);if(p.human){const h=p.hud.hit;h.classList.add('on');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('on'),130)}}}
+ if(f.t>=4||(f.t>.35&&!p.hold))p.fly=null}
+function torMesh(){const g=new THREE.Group(),W=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false}),B=new THREE.MeshBasicMaterial({color:0x2f86ff,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false});
+ const cone=(r,h,m)=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r,h,18,6,true),m);c.rotation.x=PI;c.position.y=h/2;return c};
+ g.userData.minis=[];for(let i=0;i<6;i++){const s=new THREE.Group();s.add(cone(1,3.2,W));const ib=cone(.6,3,B);s.add(ib);g.add(s);g.userData.minis.push(s)}
+ const big=new THREE.Group();big.add(cone(5.2,10,W));const b2=cone(3.4,9.5,B);big.add(b2);for(let i=0;i<3;i++){const t=new THREE.Mesh(new THREE.TorusGeometry(1.6+i*1.3,.12,6,24),W);t.rotation.x=PI/2;t.position.y=1.5+i*3;big.add(t)}
+ g.add(big);g.userData.big=big;g.userData.mats=[W,B];return g}
+function torStep(p,dt){const on=p.pu===SUPREMA&&!p.dead&&(p.spinA||(p.kind=='remote'&&p.ca&&p.ca.k=='furacao'&&p.ext));let g=p.tor;
+ if(!on){if(g&&g.visible)g.visible=false;return}
+ if(!g){g=p.tor=torMesh();S.add(g)}g.visible=true;const tt=p.spinA?p.spinA.t:p.ca?p.ca.t:1;g.position.copy(p.pos);
+ const mg=ss(.55,1,tt),ud=g.userData;ud.minis.forEach((m,i)=>{const a=tt*4+i*PI/3,r=3.4*(1-mg);m.visible=tt<1.05;m.position.set(Math.sin(a)*r,0,Math.cos(a)*r);m.rotation.y=tt*14;m.scale.setScalar(.6+mg*.6)});
+ const bs=ss(.8,1.15,tt);ud.big.visible=tt>=.8;ud.big.scale.set(bs,Math.max(.05,bs),bs);ud.big.rotation.y=tt*11;ud.big.children.forEach((c,i)=>{if(i>=2)c.position.y=1.5+((i-2)*3+tt*6)%9});
+ if(tt>=.8&&p.spinA&&p.kind!='remote'){if(Math.random()<.5)burst(p.pos.clone().add(new V3((Math.random()-.5)*8,Math.random()*8,(Math.random()-.5)*8)),Math.random()<.5?0xffffff:0x2f86ff,1,3);
+  for(const o of P){if(o===p||o.dead||o.kind=='remote')continue;const ex=p.pos.x-o.pos.x,ez=p.pos.z-o.pos.z,el=Math.hypot(ex,ez);if(el>20||el<2.2)continue;const k=Math.min(el-2.2,(9+(20-el)*.6)*dt);o.pos.x+=ex/el*k;o.pos.z+=ez/el*k}}}
 const cbName=(p,cb)=>p.pu===SUPREMA?(CBF.has(cb)?'Suprema ':'Supremo ')+CB[cb][0]:CB[cb][0];
 function supOn(a){return a&&a.pu===SUPREMA&&(performance.now()<(a.supU||0)||a.multi||a.flurry||a.spinA||a.whirl||a.slam)}
 function comboFx(p,cb){if(p.pu===SUPREMA){p.supU=performance.now()+1800;const q=p.pos.clone().setY(p.pos.y+1.2*p.scl);burst(q,0xffffff,22,8);burst(q,0x2f86ff,16,7);if(near(p)<30)snd(1046,.18,'sine',.08,1568)}if(cb=='meteoro'||cb=='golfinho')sfxSwing(p,true);p.ca={k:cb,t:0,d:CBD[cb]};p.cbN++;p.cbK=cb;if(cb=='metra'||cb=='furacao'){if(p.human)setTimeout(()=>msg(p,'Segure o soco para continuar!'),700);else p.holdT=.2+Math.random()*2.5}burst(p.pos.clone().setY(p.pos.y+1.4*p.scl),0xffe14d,10,4);if(p.human)msg(p,cbName(p,cb)+'!')}
 const bon=p=>1+Math.min(.5,(p.chT>0?p.ch:0)*.05);
 function regHit(p){p.ch=p.chT>0?p.ch+1:1;p.chT=2}
-function slam(p){const gf=p.slamK==='golfinho',R=(gf?6.5:4.5)*SR(p),D=gf?30:22;ring(p.pos.x,p.pos.z,gf?0x4fc3ff:0xffe14d,SR(p));burst(p.pos.clone().setY(p.pos.y+.3),gf?0xbfeaff:0xd9c9a0,gf?30:18,gf?9:7);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);if(near(p)<30)snd(80,.35,'sine',.22,40);
+function slam(p){if(p.pu===SUPREMA)meteorRain(p,p.slamK==='golfinho');const gf=p.slamK==='golfinho',R=(gf?6.5:4.5)*SR(p),D=gf?30:22;ring(p.pos.x,p.pos.z,gf?0x4fc3ff:0xffe14d,SR(p));burst(p.pos.clone().setY(p.pos.y+.3),gf?0xbfeaff:0xd9c9a0,gf?30:18,gf?9:7);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);if(near(p)<30)snd(80,.35,'sine',.22,40);
  for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez);
   if(el<R*p.scl&&Math.abs(o.pos.y-p.pos.y)<2.5){deliver(o,p,{d:D*p.M.d*bon(p),kx:ex/(el||1)*8,kz:ez/(el||1)*8,f:16|128});regHit(p);sfxHit(p,true)}}}
 function splash(p){const q=new V3(p.pos.x,WATER+.1,p.pos.z);burst(q,0xffffff,10,5);burst(q,0x7fd0ff,10,4)}
@@ -821,6 +867,7 @@ function spinHit(p,mult){const m=p.M,sr=SR(p);sfxSwing(p,true);ring(p.pos.x,p.po
   for(const o of P){if(o===p||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez);
    if(el-.45*o.scl<3.3*m.r*sr&&Math.abs(o.pos.y-p.pos.y)<2.2*sr){deliver(o,p,{d:20*m.d*.75*mult*bon(p),kx:ex/(el||1)*7,kz:ez/(el||1)*7,f:16});regHit(p);n++;burst(o.pos.clone().setY(o.pos.y+1.2),0xffffff,8)}}
   for(const c of chests)if(Math.hypot(c.x-p.pos.x,c.z-p.pos.z)<3.3*sr)hitChest(c,2,p);
+  if(p.pu===SUPREMA)for(const o of P){if(o===p||o.dead||o.kind!='remote')continue;const ex=p.pos.x-o.pos.x,ez=p.pos.z-o.pos.z,el=Math.hypot(ex,ez);if(el>3.3*m.r*sr&&el<20)deliver(o,p,{d:.2,kx:ex/el*9,kz:ez/el*9,f:0,nx:1})}
   if(n&&p.human){const h=p.hud.hit;h.classList.add('on');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('on'),130)}if(n)sfxHit(p,true)}}
 function strike(p,strong,mult,second,cb){const m=p.M,f=fw(p),rng=2.3*m.r*(p.scl>1?1.25:1)*(strong?1.15:1);
  if(cb=='furacao'){p.spinA={t:0,next:.4};spinHit(p,1);return}
@@ -846,6 +893,7 @@ function strike(p,strong,mult,second,cb){const m=p.M,f=fw(p),rng=2.3*m.r*(p.scl>
  let fl=0;if(m.burn)fl|=1;if(m.frz)fl|=2;if(m.stun&&Math.random()<m.stun)fl|=4;if(m.poi)fl|=8;if(strong)fl|=16;if(cb=='gancho'||cb=='tubarao')fl|=128;if(cb=='contra')fl|=4;let st=0;if(cb=='metra'||cb=='flurry'){fl|=4;st=.45}
  deliver(best,p,{d:dmg,kx:nx*kb,kz:nz*kb,f:fl,st});regHit(p);
 
+ if(p.pu===SUPREMA&&(cb=='gancho'||cb=='martelo'||cb=='contra'))supStrike(p,cb,best,dmg);
  if(cb=='martelo'){ring(best.pos.x,best.pos.z,0xffd34d,SR(p));netPush(['w',r2(best.pos.x),r2(best.pos.z)],p);for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-best.pos.x,ez=o.pos.z-best.pos.z,el=Math.hypot(ex,ez);if(el<4*SR(p))deliver(o,p,{d:dmg*.5,kx:ex/(el||1)*7,kz:ez/(el||1)*7,f:16})}}
  if(m.life)p.hp=Math.min(100,p.hp+dmg*m.life);
  burst(new V3(best.pos.x-nx*.4,best.pos.y+1.3*best.scl,best.pos.z-nz*.4),crit?0xffe14d:0xffffff,crit?14:8);
@@ -862,7 +910,7 @@ function applyHit(v,aid,h){if(v.dead||v.inv>0)return;const a=byId(aid);let d=cla
   if((dx*F[0]+dz*F[1])/l>.2){d*=.25;kx*=.3;kz*=.3;f&=64;v.cntT=.8;burst(v.pos.clone().setY(v.pos.y+1.4),0x9fd4ff,5,3);if(v.human){snd(900,.06,'square',.05,600);msg(v,'Defendeu! Solte um forte para contra-atacar')}}else{v.ch=0;v.chT=0}}else{v.ch=0;v.chT=0}
  d*=v.M.df;if(v.sh>0){const s=Math.min(v.sh,d);v.sh-=s;d-=s}
  v.hp-=d;v.vx+=kx;v.vz+=kz;if(f&128){v.vy=9;v.gr=false}else if((f&16)&&v.gr){v.vy=4.5;v.gr=false}
- if(f&1){v.burn=3;v.burnBy=aid}if(f&2)v.frz=2.2;if(f&4){v.stun=Math.max(v.stun,clamp(+h.st||.8,.1,2.5));v.pend=null;v.multi=null;v.flurry=null;v.spinA=null;v.whirl=null;v.bl=false;if(v.ca&&v.ca.k!='meteoro')v.ca=null;v.pnT=0}if(f&8){v.poi=6;v.poiBy=aid}
+ if(f&1){v.burn=3;v.burnBy=aid}if(f&2)v.frz=2.2;if(f&4){v.stun=Math.max(v.stun,clamp(+h.st||.8,.1,2.5));v.pend=null;v.multi=null;v.flurry=null;v.spinA=null;v.whirl=null;v.fly=null;v.bl=false;if(v.ca&&v.ca.k!='meteoro')v.ca=null;v.pnT=0}if(f&8){v.poi=6;v.poiBy=aid}
  if(v.M.refl&&a&&d>0&&!(f&64)&&!(h.st>0))deliver(a,v,{d:d*v.M.refl,kx:0,kz:0,f:64});
  if(v.kind=='bot'){v.alert=aid;v.alertT=4}
  if(v.human){v.dmgA=Math.min(1,v.dmgA+.6);snd(120,.16,'sine',.14,55)}
@@ -916,7 +964,7 @@ function givePU(p,k){const pu=PU[k];if(!pu)return;p.pu=k;p.puT=DUR[pu[1]];setMod
  if(pu[1]>=2)feed(p.name,pu[0],'pegou a')}
 
 /* ================= física ================= */
-function move(p,mx,mz,sprint,jump,dt){if(p.stun>0||p.flurry){mx=mz=0;jump=false;sprint=false}
+function move(p,mx,mz,sprint,jump,dt){if(p.fly&&!p.dead){flyMove(p,dt);return}if(p.stun>0||p.flurry){mx=mz=0;jump=false;sprint=false}
  const l=Math.hypot(mx,mz);if(l>1){mx/=l;mz/=l}p.spr=!!sprint&&l>.3&&!p.bl;
  let sp=(sprint&&!p.bl?10.5:7)*p.M.s;if(p.bl)sp*=.5;if(p.frz>0)sp*=.45;if(p.swim)sp*=sprint?.85:.6;else if(H(p.pos.x,p.pos.z)<WATER-.2)sp*=.75;
  const s=Math.sin(p.yaw),c=Math.cos(p.yaw);let dx=(-s*mz+c*mx)*sp*dt,dz=(-c*mz-s*mx)*sp*dt;const len=Math.hypot(dx,dz);
@@ -1059,7 +1107,7 @@ function anim(p,dt){const rg=p.rig;if(!rg)return;const now=performance.now()/100
   else{const e=Math.sin(PI*u);gl[h]=L3(gl[h],[sd*TP.pun[0],TP.pun[1],TP.pun[2]],e);ry+=sd*.3*e;rx-=.08*e;
    fp[h]=L3(fp[h],[sd*FP.pun[0],FP.pun[1],FP.pun[2]],e)}}
  // combos
- if(p.ca&&(p.ca.k=='metra'||p.ca.k=='furacao')){const a=p.ca,act=p.kind=='remote'?p.ext:(a.k=='metra'?!!p.flurry:!!p.spinA);if(act)a.d=Math.max(a.d,a.t+dt+.15);else if(a.t>.3)a.d=Math.min(a.d,a.t+dt+.1)}
+ if(p.ca&&(p.ca.k=='metra'||p.ca.k=='furacao'||p.ca.k=='voador')){const a=p.ca,act=p.kind=='remote'?p.ext:(a.k=='metra'?!!p.flurry:a.k=='voador'?!!p.fly:!!p.spinA);if(act)a.d=Math.max(a.d,a.t+dt+.15);else if(a.t>.3)a.d=Math.min(a.d,a.t+dt+.1)}
  if(p.ca){const a=p.ca;a.t+=dt;const u=Math.min(1,a.t/a.d),env=ss(0,.15,u)*(1-ss(.8,1,u));
   if((a.k=='meteoro'||a.k=='golfinho')&&(!air||swim)&&a.t>.12){p.ca={k:'pouso',t:0,d:CBD.pouso}}
   else switch(a.k){
@@ -1108,7 +1156,7 @@ function update(dt){
    if(!p.dead&&p.poi>0){p.poi-=dt;p.hp-=3*dt;if(p.fxT<=0)burst(p.pos.clone().setY(p.pos.y+1.2),0x63d33c,2,2);if(p.hp<=0)ko(p,p.poiBy)}
    if(!p.dead&&p.frz>0&&p.fxT<=0)burst(p.pos.clone().setY(p.pos.y+1),0x9fe3ff,2,2);
    if(p.fxT<=0)p.fxT=.15}
-  if(p.stun>0&&p.kind!='remote'){p.pend=null;p.multi=null;p.flurry=null;p.spinA=null;p.whirl=null}
+  if(p.stun>0&&p.kind!='remote'){p.pend=null;p.multi=null;p.flurry=null;p.spinA=null;p.whirl=null;p.fly=null}
   if(!p.dead&&p.pend){p.pend.t-=dt;if(p.pend.t<=0){const s=p.pend.strong,cb=p.pend.cb;p.pend=null;strike(p,s,1,false,cb)}}
   p.chT-=dt;if(p.chT<=0)p.ch=0;p.cntT-=dt;
   p.leapT=(p.leapT||0)-dt;p.hxT=(p.hxT||0)-dt;supWall(p);
@@ -1130,7 +1178,8 @@ function update(dt){
    if(!done&&blocked(q.x,q.y,q.z))done=true}
   if(done){burst(r.m.position,r.col||0xffe14d,10,6);S.remove(r.m);RK.splice(i,1)}}
  for(let i=FX.length-1;i>=0;i--){const f=FX[i];f.l-=dt;f.v.y-=14*dt;f.m.position.addScaledVector(f.v,dt);if(f.l<=0){S.remove(f.m);FX.splice(i,1)}}
- for(let i=RINGS.length-1;i>=0;i--){const r=RINGS[i];r.l-=dt;r.m.scale.setScalar(1+(.5-r.l)*10*(r.b||1));r.m.material.opacity=r.l*2;if(r.l<=0){S.remove(r.m);RINGS.splice(i,1)}}
+ supFxStep(dt);for(const q of P)torStep(q,dt);
+for(let i=RINGS.length-1;i>=0;i--){const r=RINGS[i];r.l-=dt;r.m.scale.setScalar(1+(.5-r.l)*10*(r.b||1));r.m.material.opacity=r.l*2;if(r.l<=0){S.remove(r.m);RINGS.splice(i,1)}}
  for(let i=BOLTS.length-1;i>=0;i--){const b=BOLTS[i];b.l-=dt;if(b.l<=0){S.remove(b.m);BOLTS.splice(i,1)}}
  if(authority()){for(let i=chestTimers.length-1;i>=0;i--){chestTimers[i]-=dt;if(chestTimers[i]<=0){chestTimers.splice(i,1);spawnChest()}}
   if(chests.length+chestTimers.length<CHN)chestTimers.push(2)}
@@ -1238,7 +1287,7 @@ function netIn(){const g=net.gr;if(!g)return;let peers=[];try{peers=g.peers()}ca
    else if(v[1]==='c'&&net.host){const c=chests.find(c=>c.id===v[2]);if(c)chestDamage(c,clamp(v[3]|0,1,3),e.id)}
    else if(v[1]==='B')bubbles(e,true,new V3(+v[2],+v[3],+v[4]),+v[5]);
    else if(v[1]==='r')rocket(e,true,new V3(+v[2],+v[3],+v[4]),new V3(+v[5],+v[6],+v[7]));
-   else if(v[1]==='w')ring(+v[2],+v[3],e.pu>=0?PU[e.pu][2]:0xffffff);else if(v[1]==='X')hyperFx(+v[2],+v[3],+v[4],+v[5]===1,e.pu)}
+   else if(v[1]==='w')ring(+v[2],+v[3],e.pu>=0?PU[e.pu][2]:0xffffff);else if(v[1]==='X')hyperFx(+v[2],+v[3],+v[4],+v[5]===1,e.pu);else if(v[1]==='G')giantGlove(+v[2],+v[3],+v[4],+v[5]);else if(v[1]==='M'){for(let j=3;j+1<v.length;j+=2)addMeteor(null,+v[j],+v[j+1],(j-3)*.06,v[2]===1)}}
   const dc=s.dc|0,ldc=net.lastDc[pe.peer];
   if(dc>ldc){const kb=s.kb,kn=kb===me.id?'Você':((byId(kb)||{}).name||'Alguém');feed(kn,e.name);if(kb===me.id){me.score++;addKo();msg(me,'Nocaute em '+e.name+'! +'+KO_COINS+(KO_COINS==1?' moeda':' moedas'));snd(660,.16,'triangle',.12,1320);board()}}
   net.lastDc[pe.peer]=dc}
@@ -1259,7 +1308,7 @@ function netIn(){const g=net.gr;if(!g)return;let peers=[];try{peers=g.peers()}ca
    for(const v of hs.co){if(!Array.isArray(v)||!(+v[0]>net.lastCo[host]))continue;net.lastCo[host]=+v[0];if(v[1]===me.id)givePU(me,v[2]|0)}}}}
 function netOut(dt){net.acc+=dt;if(net.acc<.05||!net.gr)return;net.acc=0;const me=P[0];
  net.gr.presence({v:1,lk:[myLook.h,myLook.hc,myLook.sk,myLook.o,myLook.oc,myLook.ac],nm:me.name,ci:me.ci|0,s:[r2(me.pos.x),r2(me.pos.y),r2(me.pos.z),r3(me.yaw),r3(me.pitch)],hp:Math.ceil(Math.max(0,me.hp)),sh:Math.ceil(me.sh),dd:me.dead?1:0,
-  pu:me.pu,pn:me.pn,fl:(me.flurry||me.spinA)?1:0,cb:[me.cbN,me.cbK],ph:me.ph,pS:me.pS,bl:me.bl?1:0,sc:me.score,dc:net.dc,kb:net.kb,ev:net.ev,
+  pu:me.pu,pn:me.pn,fl:(me.flurry||me.spinA||me.fly)?1:0,cb:[me.cbN,me.cbK],ph:me.ph,pS:me.pS,bl:me.bl?1:0,sc:me.score,dc:net.dc,kb:net.kb,ev:net.ev,
   cs:net.host?chests.map(c=>[c.id,c.sp,c.rar,c.hp,c.max]):null,co:net.host?net.co:null,tl:net.host?Math.ceil(Math.max(0,matchT)):null}).catch(()=>{})}
 let p2p=false;
 const P2P={async join(code,host){
@@ -1358,7 +1407,7 @@ const CTL={cpu:`<div><b>Teclado e mouse</b><kbd>W A S D</kbd> andar · <kbd>Mous
  <div><b>Luvas especiais</b>Ache baús e soque até abrir. Os comuns ficam pelo campo; os raros, épicos e lendários estão no alto dos morros e no fundo do lago, e precisam de muitos socos.</div>`,
  duo:`<div><b>Jogador 1 (esquerda)</b><kbd>W A S D</kbd> andar · <kbd>Mouse</kbd> olhar · <kbd>Clique</kbd> soco · <kbd>Botão direito</kbd> soco forte · <kbd>Q</kbd> defender · <kbd>Espaço</kbd> pular</div>
  <div><b>Jogador 2 (direita)</b>Controle: <kbd>RT</kbd> soco, <kbd>RB</kbd> soco forte, <kbd>LT</kbd> defender, <kbd>A</kbd> pular. Teclado: <kbd>I J K L</kbd> andar · <kbd>Setas</kbd> olhar · <kbd>Enter</kbd> soco · <kbd>Shift dir.</kbd> forte · <kbd>P</kbd> defender · <kbd>O</kbd> pular · <kbd>U</kbd> (ou <kbd>Y</kbd> no controle) Hiper Explosão</div>`};
-{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.<br><strong>👑 Com a Luva Suprema</strong>, todos viram combos Supremos (ex.: Supremo Gancho Duplo, Suprema Metralhadora) com força 6 vezes maior, empurrão gigante e área 2 vezes maior; a Suprema Metralhadora enche a tela com 50 luvas.<br><strong>💥 Hiper Explosão</strong> (luvas lendárias e Suprema): <kbd>E</kbd> solta uma explosão que joga todo mundo longe. Recarrega em 12 s (6 s na Suprema, que é bem maior).</div>`;CTL.cpu+=cc;CTL.duo+=cc}
+{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.<br><strong>👑 Com a Luva Suprema</strong>, todos viram combos Supremos (ex.: Supremo Gancho Duplo, Suprema Metralhadora) com força 6 vezes maior, empurrão gigante e área 2 vezes maior; a Suprema Metralhadora enche a tela com 50 luvas.<br><strong>Combos Supremos especiais:</strong> Supremo Furacão (6 furacões rodam em volta, viram um furacão gigante e puxam todo mundo), Supremo Soco Voador (segure o soco e voe para onde estiver olhando, até 4 s), Supremo Gancho Duplo (luva gigante sai do chão), Supremo Martelo (luva gigante cai do céu), Supremo Meteoro e Salto do Golfinho (chuva de meteoros) e Supremo Contra-ataque (onda de choque em volta).<br><strong>💥 Hiper Explosão</strong> (luvas lendárias e Suprema): <kbd>E</kbd> solta uma explosão que joga todo mundo longe. Recarrega em 12 s (6 s na Suprema, que é bem maior).</div>`;CTL.cpu+=cc;CTL.duo+=cc}
 CTL.online=CTL.cpu;
 CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div class="cbx">[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
 function modeUI(){const m=cfg.mode,duo=m=='duo',r=$('#bots');$('#offrows').classList.toggle('hide',m=='online');$('#onl').classList.toggle('hide',m!='online');
