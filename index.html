@@ -773,7 +773,7 @@ function punch(p,strong){if(p.dead||p.cd>0||p.stun>0||p.pend||p.flurry||p.spinA|
  else if(cb=='voador'||cb=='tubarao'){const f=fw(p),k=cb=='tubarao'?20:16;p.vx+=f[0]*k;p.vz+=f[1]*k}
  if(m.dash){const f=fw(p);p.vx+=f[0]*8;p.vz+=f[1]*8}
  const d=p.human?0:near(p);if(d<25)snd(strong?260:380,.12,'triangle',.05*(1-d/25),strong?90:160)}
-const CB={gancho:['Gancho Duplo','soco, soco, forte','o forte dobra de força e joga para o alto'],metra:['Metralhadora','4 socos seguidos','socos relâmpago enquanto você segurar o soco (até 4 s), e o adversário fica atordoado até acabar'],
+const CB={gancho:['Uppercut','soco, soco, forte','o forte dobra de força e joga para o alto (na Suprema, lança o alvo lá no céu)'],metra:['Metralhadora','4 socos seguidos','socos relâmpago enquanto você segurar o soco (até 4 s), e o adversário fica atordoado até acabar'],
  martelo:['Martelo','forte, forte','onda de choque em volta'],furacao:['Furacão','soco, forte, soco, forte','gira acertando todo mundo perto enquanto você segurar o soco (até 5 s)'],
  meteoro:['Meteoro','pule e dê um soco forte no ar','despenca e explode o chão'],contra:['Contra-ataque','defenda um golpe e solte um forte','dano dobrado e atordoa'],
  voador:['Soco Voador','correndo, soco forte','voa para frente com o punho'],
@@ -808,7 +808,7 @@ function meteorRain(p,water){const pts=[];for(let i=0;i<9;i++){const a=i/9*2*PI+
  for(let j=0;j<pts.length;j+=2)addMeteor(p,pts[j],pts[j+1],j*.06,water);netPush(['M',water?1:0,...pts],p)}
 function supStrike(p,cb,best,dmg){const x=best.pos.x,y=best.pos.y,z=best.pos.z;
  if(cb=='gancho'||cb=='martelo'){const k=cb=='martelo'?1:0;giantGlove(k,x,y,z);netPush(['G',k,r2(x),r2(y),r2(z)],p);
-  for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-x,ez=o.pos.z-z,el=Math.hypot(ex,ez)||.01;if(el>5.5)continue;deliver(o,p,{d:dmg*.6,kx:ex/el*(k?14:4),kz:ez/el*(k?14:4),f:k?16|4:16|128,st:.6});regHit(p)}}
+  for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-x,ez=o.pos.z-z,el=Math.hypot(ex,ez)||.01;if(el>5.5)continue;deliver(o,p,{d:dmg*.6,kx:ex/el*(k?14:4),kz:ez/el*(k?14:4),f:k?16|4:16|256|4,st:k?.6:1});regHit(p)}}
  if(cb=='contra'){ring(p.pos.x,p.pos.z,0xffffff,2.2);setTimeout(()=>ring(p.pos.x,p.pos.z,0x2f86ff,1.6),110);burst(p.pos.clone().setY(p.pos.y+1.2),0x2f86ff,30,10);netPush(['w',r2(p.pos.x),r2(p.pos.z)],p);
   for(const o of P){if(o===p||o===best||o.dead)continue;const ex=o.pos.x-p.pos.x,ez=o.pos.z-p.pos.z,el=Math.hypot(ex,ez)||.01;if(el>8)continue;deliver(o,p,{d:dmg*.4,kx:ex/el*16,kz:ez/el*16,f:16|4,st:.7});regHit(p)}}}
 function supFxStep(dt){
@@ -823,7 +823,7 @@ function supFxStep(dt){
    if(m.o&&!m.o.dead)for(const o of P){if(o===m.o||o.dead)continue;const ex=o.pos.x-m.x,ez=o.pos.z-m.z,el=Math.hypot(ex,ez)||.01;if(el<3.4&&Math.abs(o.pos.y-m.y0)<3){deliver(o,m.o,{d:16,kx:ex/el*12,kz:ez/el*12,f:16|128,st:.5});regHit(m.o)}}
    S.remove(m.m);METS.splice(i,1)}}}
 function flyMove(p,dt){const f=p.fly;f.t+=dt;const cp=Math.cos(p.pitch),dx=-Math.sin(p.yaw)*cp,dy=Math.sin(p.pitch),dz=-Math.cos(p.yaw)*cp,sp=24*p.M.s;
- p.pos.x=clamp(p.pos.x+dx*sp*dt,-LIM,LIM);p.pos.z=clamp(p.pos.z+dz*sp*dt,-LIM,LIM);p.pos.y=Math.min(p.pos.y+dy*sp*dt,70);
+ p.pos.x=clamp(p.pos.x+dx*sp*dt,-LIM,LIM);p.pos.z=clamp(p.pos.z+dz*sp*dt,-LIM,LIM);p.pos.y=Math.min(p.pos.y+dy*sp*dt,250);
  const g=H(p.pos.x,p.pos.z);if(p.pos.y<g){p.pos.y=g}p.vy=0;p.vx=p.vz=0;p.gr=p.pos.y<=g+.05;p.swim=false;p.spr=true;
  f.fx=(f.fx||0)-dt;if(f.fx<=0){f.fx=.04;const q=p.pos.clone().setY(p.pos.y+1*p.scl);burst(q,0xffffff,2,2);burst(q,0x2f86ff,1,2)}
  f.next-=dt;if(f.next<=0){f.next=.12;let n=0;const now=f.t;
@@ -831,7 +831,7 @@ function flyMove(p,dt){const f=p.fly;f.t+=dt;const cp=Math.cos(p.pitch),dx=-Math
    if(f.hit[o.id]&&now-f.hit[o.id]<.5)continue;f.hit[o.id]=now;deliver(o,p,{d:20*p.M.d*bon(p),kx:dx*14,kz:dz*14,f:16|128,st:.5});regHit(p);n++;burst(o.pos.clone().setY(o.pos.y+1.2*o.scl),0x2f86ff,10,7)}
   for(const c of chests)if(Math.hypot(c.x-p.pos.x,c.z-p.pos.z)<2.8&&Math.abs(c.y-p.pos.y)<2.5)hitChest(c,1,p);
   if(n){sfxHit(p,true);if(p.human){const h=p.hud.hit;h.classList.add('on');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('on'),130)}}}
- if(f.t>=4||(f.t>.35&&!p.hold))p.fly=null}
+ if(f.t>.35&&!p.hold)p.fly=null}
 function torMesh(){const g=new THREE.Group(),W=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false}),B=new THREE.MeshBasicMaterial({color:0x2f86ff,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false});
  const cone=(r,h,m)=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r,h,18,6,true),m);c.rotation.x=PI;c.position.y=h/2;return c};
  g.userData.minis=[];for(let i=0;i<6;i++){const s=new THREE.Group();s.add(cone(1,3.2,W));const ib=cone(.6,3,B);s.add(ib);g.add(s);g.userData.minis.push(s)}
@@ -890,7 +890,7 @@ function strike(p,strong,mult,second,cb){const m=p.M,f=fw(p),rng=2.3*m.r*(p.scl>
  const cm={gancho:1.6,metra:1.3,martelo:1.4,contra:2,voador:1.3,tubarao:1.8}[cb]||1;
  const crit=m.crit&&Math.random()<m.crit,dmg=(strong?20:8)*m.d*mult*(crit?2:1)*cm*bon(p),kb=(strong?9:3.5)*m.k*(m.mag?-.6:1)*(cb=='voador'?1.5:cb=='metra'||cb=='flurry'?.08:1);
  const dx=best.pos.x-p.pos.x,dz=best.pos.z-p.pos.z,l=Math.hypot(dx,dz)||1,nx=dx/l,nz=dz/l;
- let fl=0;if(m.burn)fl|=1;if(m.frz)fl|=2;if(m.stun&&Math.random()<m.stun)fl|=4;if(m.poi)fl|=8;if(strong)fl|=16;if(cb=='gancho'||cb=='tubarao')fl|=128;if(cb=='contra')fl|=4;let st=0;if(cb=='metra'||cb=='flurry'){fl|=4;st=.45}
+ let fl=0;if(m.burn)fl|=1;if(m.frz)fl|=2;if(m.stun&&Math.random()<m.stun)fl|=4;if(m.poi)fl|=8;if(strong)fl|=16;if(cb=='gancho'||cb=='tubarao')fl|=128;if(cb=='contra')fl|=4;let st=0;if(cb=='metra'||cb=='flurry'){fl|=4;st=.45}if(cb=='gancho'&&p.pu===SUPREMA){fl|=256|4;st=1.2}
  deliver(best,p,{d:dmg,kx:nx*kb,kz:nz*kb,f:fl,st});regHit(p);
 
  if(p.pu===SUPREMA&&(cb=='gancho'||cb=='martelo'||cb=='contra'))supStrike(p,cb,best,dmg);
@@ -909,7 +909,7 @@ function applyHit(v,aid,h){if(v.dead||v.inv>0)return;const a=byId(aid);let d=cla
  if(v.bl&&a){const dx=a.pos.x-v.pos.x,dz=a.pos.z-v.pos.z,l=Math.hypot(dx,dz)||1,F=fw(v);
   if((dx*F[0]+dz*F[1])/l>.2){d*=.25;kx*=.3;kz*=.3;f&=64;v.cntT=.8;burst(v.pos.clone().setY(v.pos.y+1.4),0x9fd4ff,5,3);if(v.human){snd(900,.06,'square',.05,600);msg(v,'Defendeu! Solte um forte para contra-atacar')}}else{v.ch=0;v.chT=0}}else{v.ch=0;v.chT=0}
  d*=v.M.df;if(v.sh>0){const s=Math.min(v.sh,d);v.sh-=s;d-=s}
- v.hp-=d;v.vx+=kx;v.vz+=kz;if(f&128){v.vy=9;v.gr=false}else if((f&16)&&v.gr){v.vy=4.5;v.gr=false}
+ v.hp-=d;v.vx+=kx;v.vz+=kz;if(f&256){v.vy=28;v.gr=false;burst(v.pos.clone().setY(v.pos.y+.5),0x2f86ff,14,8)}else if(f&128){v.vy=9;v.gr=false}else if((f&16)&&v.gr){v.vy=4.5;v.gr=false}
  if(f&1){v.burn=3;v.burnBy=aid}if(f&2)v.frz=2.2;if(f&4){v.stun=Math.max(v.stun,clamp(+h.st||.8,.1,2.5));v.pend=null;v.multi=null;v.flurry=null;v.spinA=null;v.whirl=null;v.fly=null;v.bl=false;if(v.ca&&v.ca.k!='meteoro')v.ca=null;v.pnT=0}if(f&8){v.poi=6;v.poiBy=aid}
  if(v.M.refl&&a&&d>0&&!(f&64)&&!(h.st>0))deliver(a,v,{d:d*v.M.refl,kx:0,kz:0,f:64});
  if(v.kind=='bot'){v.alert=aid;v.alertT=4}
@@ -1407,7 +1407,7 @@ const CTL={cpu:`<div><b>Teclado e mouse</b><kbd>W A S D</kbd> andar · <kbd>Mous
  <div><b>Luvas especiais</b>Ache baús e soque até abrir. Os comuns ficam pelo campo; os raros, épicos e lendários estão no alto dos morros e no fundo do lago, e precisam de muitos socos.</div>`,
  duo:`<div><b>Jogador 1 (esquerda)</b><kbd>W A S D</kbd> andar · <kbd>Mouse</kbd> olhar · <kbd>Clique</kbd> soco · <kbd>Botão direito</kbd> soco forte · <kbd>Q</kbd> defender · <kbd>Espaço</kbd> pular</div>
  <div><b>Jogador 2 (direita)</b>Controle: <kbd>RT</kbd> soco, <kbd>RB</kbd> soco forte, <kbd>LT</kbd> defender, <kbd>A</kbd> pular. Teclado: <kbd>I J K L</kbd> andar · <kbd>Setas</kbd> olhar · <kbd>Enter</kbd> soco · <kbd>Shift dir.</kbd> forte · <kbd>P</kbd> defender · <kbd>O</kbd> pular · <kbd>U</kbd> (ou <kbd>Y</kbd> no controle) Hiper Explosão</div>`};
-{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.<br><strong>👑 Com a Luva Suprema</strong>, todos viram combos Supremos (ex.: Supremo Gancho Duplo, Suprema Metralhadora) com força 6 vezes maior, empurrão gigante e área 2 vezes maior; a Suprema Metralhadora enche a tela com 50 luvas.<br><strong>Combos Supremos especiais:</strong> Supremo Furacão (6 furacões rodam em volta, viram um furacão gigante e puxam todo mundo), Supremo Soco Voador (segure o soco e voe para onde estiver olhando, até 4 s), Supremo Gancho Duplo (luva gigante sai do chão), Supremo Martelo (luva gigante cai do céu), Supremo Meteoro e Salto do Golfinho (chuva de meteoros) e Supremo Contra-ataque (onda de choque em volta).<br><strong>💥 Hiper Explosão</strong> (luvas lendárias e Suprema): <kbd>E</kbd> solta uma explosão que joga todo mundo longe. Recarrega em 12 s (6 s na Suprema, que é bem maior).</div>`;CTL.cpu+=cc;CTL.duo+=cc}
+{const cc=`<div class="cbx"><b>Combos</b><ul>${Object.values(CB).map(c=>`<li><strong>${c[0]}</strong>: ${c[1]}. <span>${c[2]}</span></li>`).join('')}</ul>Cada golpe seguido sem apanhar aumenta sua força, até +50%.<br><strong>👑 Com a Luva Suprema</strong>, todos viram combos Supremos (ex.: Supremo Uppercut, Suprema Metralhadora) com força 6 vezes maior, empurrão gigante e área 2 vezes maior; a Suprema Metralhadora enche a tela com 50 luvas.<br><strong>Combos Supremos especiais:</strong> Supremo Furacão (6 furacões rodam em volta, viram um furacão gigante e puxam todo mundo), Supremo Soco Voador (segure o soco e voe para onde estiver olhando, sem limite de tempo), Supremo Uppercut (luva gigante sai do chão e lança o alvo lá no céu), Supremo Martelo (luva gigante cai do céu), Supremo Meteoro e Salto do Golfinho (chuva de meteoros) e Supremo Contra-ataque (onda de choque em volta).<br><strong>💥 Hiper Explosão</strong> (luvas lendárias e Suprema): <kbd>E</kbd> solta uma explosão que joga todo mundo longe. Recarrega em 12 s (6 s na Suprema, que é bem maior).</div>`;CTL.cpu+=cc;CTL.duo+=cc}
 CTL.online=CTL.cpu;
 CTL.touch=`<div><b>No celular</b>Jogue com o celular deitado. <strong>Joystick</strong> à esquerda para andar (empurre até a borda para correr) · <strong>arraste</strong> no lado direito para olhar · botões <strong>Soco</strong>, <strong>Forte</strong>, <strong>Defesa</strong> (segure) e <strong>Pular</strong> · <strong>II</strong> pausa.</div>`+(CTL.cpu.match(/<div class="cbx">[\s\S]*<\/div>$/)||[''])[0].replace(/\(Shift\)/g,'(joystick na borda)');
 function modeUI(){const m=cfg.mode,duo=m=='duo',r=$('#bots');$('#offrows').classList.toggle('hide',m=='online');$('#onl').classList.toggle('hide',m!='online');
